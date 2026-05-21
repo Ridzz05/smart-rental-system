@@ -21,7 +21,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
+// i18n
+import { useLanguage } from '../i18n/i18n';
+
 export default function Fleet() {
+  const { t } = useLanguage();
   const [vehicles, setVehicles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -56,7 +60,7 @@ export default function Fleet() {
       })
       .catch(err => {
         console.error(err);
-        showToast('Failed to load fleet data', 'error');
+        showToast(t('fleet.toast_load_failed'), 'error');
         setLoading(false);
       });
   };
@@ -90,20 +94,20 @@ export default function Fleet() {
       });
       
       if (response.ok) {
-        showToast(`Vehicle status updated to ${nextStatus}`);
+        showToast(`${t('fleet.toast_update_status')} ${nextStatus}`);
         fetchVehicles();
       } else {
         const data = await response.json();
-        showToast(data.message || 'Failed to update status', 'error');
+        showToast(data.message || t('customers.toast_validation_error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred', 'error');
+      showToast(t('customers.toast_connection_error'), 'error');
     }
   };
 
   const handleDeleteVehicle = async (id) => {
-    if (!window.confirm('Are you sure you want to remove this vehicle from fleet records?')) return;
+    if (!window.confirm(t('fleet.confirm_delete'))) return;
     try {
       const response = await fetch(`/api/vehicles/${id}`, {
         method: 'DELETE',
@@ -114,15 +118,15 @@ export default function Fleet() {
       });
       
       if (response.ok) {
-        showToast('Vehicle deleted successfully');
+        showToast(t('fleet.toast_delete_success'));
         fetchVehicles();
       } else {
         const data = await response.json();
-        showToast(data.message || 'Failed to delete vehicle', 'error');
+        showToast(data.message || t('customers.toast_connection_error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred', 'error');
+      showToast(t('customers.toast_connection_error'), 'error');
     }
   };
 
@@ -142,7 +146,7 @@ export default function Fleet() {
       
       const data = await response.json();
       if (response.ok) {
-        showToast('New vehicle registered in fleet successfully!');
+        showToast(t('fleet.toast_register_success'));
         setOpenAdd(false);
         setNewVehicle({
           brand: '',
@@ -155,11 +159,11 @@ export default function Fleet() {
         });
         fetchVehicles();
       } else {
-        showToast(data.message || 'Validation failed', 'error');
+        showToast(data.message || t('customers.toast_validation_error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred', 'error');
+      showToast(t('customers.toast_connection_error'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -187,11 +191,11 @@ export default function Fleet() {
       {/* Header Area */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>
-            Fleet Directory
+          <Typography variant="h5" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800 }}>
+            {t('fleet.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Manage your rental collection, configure daily rates, and trigger maintenance logs.
+            {t('fleet.subtitle')}
           </Typography>
         </Box>
         <Button
@@ -200,7 +204,7 @@ export default function Fleet() {
           onClick={() => setOpenAdd(true)}
           sx={{ borderRadius: 2, py: 1 }}
         >
-          Add New Vehicle
+          {t('fleet.add_vehicle')}
         </Button>
       </Box>
 
@@ -245,12 +249,12 @@ export default function Fleet() {
                   <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
                     {vehicle.license_plate}
                   </Typography>
-                  <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, mt: 0.5, mb: 1.5 }}>
+                  <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700, mt: 0.5, mb: 1.5 }}>
                     {vehicle.brand} {vehicle.model}
                   </Typography>
                   
                   <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="caption" color="text.secondary">DAILY RATE</Typography>
+                    <Typography variant="caption" color="text.secondary">{t('fleet.daily_rate')}</Typography>
                     <Typography variant="body1" sx={{ fontWeight: 800, color: 'primary.main' }}>
                       {formatCurrency(vehicle.daily_rate)}
                     </Typography>
@@ -267,7 +271,7 @@ export default function Fleet() {
                       onClick={() => handleToggleMaintenance(vehicle)}
                       sx={{ flexGrow: 1, borderRadius: 1.5 }}
                     >
-                      {isMaint ? 'Resolve Maint.' : 'Maint. Mode'}
+                      {isMaint ? t('fleet.resolve_maint') : t('fleet.maint_mode')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -289,15 +293,15 @@ export default function Fleet() {
 
       {/* Add New Vehicle Dialog */}
       <Dialog open={openAdd} onClose={() => setOpenAdd(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>
-          Register New Vehicle
+        <DialogTitle sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700 }}>
+          {t('fleet.register_title')}
         </DialogTitle>
         <form onSubmit={handleAddSubmit}>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Brand Name"
+                  label={t('fleet.brand')}
                   placeholder="e.g. Toyota, Yamaha"
                   value={newVehicle.brand}
                   onChange={(e) => setNewVehicle({ ...newVehicle, brand: e.target.value })}
@@ -307,7 +311,7 @@ export default function Fleet() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Model/Type"
+                  label={t('fleet.model')}
                   placeholder="e.g. Innova Zenix, NMAX"
                   value={newVehicle.model}
                   onChange={(e) => setNewVehicle({ ...newVehicle, model: e.target.value })}
@@ -317,7 +321,7 @@ export default function Fleet() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="License Plate Number"
+                  label={t('fleet.license_plate')}
                   placeholder="e.g. B 1234 ABC"
                   value={newVehicle.license_plate}
                   onChange={(e) => setNewVehicle({ ...newVehicle, license_plate: e.target.value })}
@@ -327,7 +331,7 @@ export default function Fleet() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  label="Daily Rental Rate (IDR)"
+                  label={t('fleet.rate_idr')}
                   type="number"
                   placeholder="e.g. 500000"
                   value={newVehicle.daily_rate}
@@ -339,13 +343,13 @@ export default function Fleet() {
               <Grid item xs={12}>
                 <TextField
                   select
-                  label="Vehicle Category"
+                  label={t('fleet.category')}
                   value={newVehicle.category_id}
                   onChange={(e) => setNewVehicle({ ...newVehicle, category_id: e.target.value })}
                   required
                   fullWidth
                 >
-                  <MenuItem value="" disabled>-- Choose Category --</MenuItem>
+                  <MenuItem value="" disabled>{t('fleet.choose_category')}</MenuItem>
                   {categories.map((cat) => (
                     <MenuItem key={cat.id} value={cat.id}>{cat.name}</MenuItem>
                   ))}
@@ -353,7 +357,7 @@ export default function Fleet() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Image URL Address"
+                  label={t('fleet.image_url')}
                   placeholder="e.g. https://images.unsplash.com/... or keep blank"
                   value={newVehicle.image_url}
                   onChange={(e) => setNewVehicle({ ...newVehicle, image_url: e.target.value })}
@@ -363,14 +367,14 @@ export default function Fleet() {
             </Grid>
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setOpenAdd(false)} color="inherit">Cancel</Button>
+            <Button onClick={() => setOpenAdd(false)} color="inherit">{t('common.cancel')}</Button>
             <Button 
               type="submit" 
               variant="contained" 
               disabled={submitting}
               sx={{ borderRadius: 2 }}
             >
-              {submitting ? 'Registering...' : 'Add Vehicle'}
+              {submitting ? t('fleet.registering') : t('fleet.add_vehicle')}
             </Button>
           </DialogActions>
         </form>

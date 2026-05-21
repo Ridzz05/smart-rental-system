@@ -31,6 +31,7 @@ const drawerWidth = 260;
 export default function Layout({ children, currentPage, setCurrentPage, mode, toggleColorMode }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isDark = mode === 'dark';
 
   const { t, language, toggleLanguage } = useLanguage();
 
@@ -50,14 +51,13 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
         display: 'flex', 
         alignItems: 'center', 
         gap: 1.5,
-        background: theme.palette.mode === 'light' 
-          ? 'linear-gradient(135deg, #4f46e5 0%, #6366f1 100%)' 
-          : 'linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)',
-        color: '#ffffff'
+        background: isDark ? '#141414' : '#FFFFFF',
+        borderBottom: `1px solid ${isDark ? '#2A2A2A' : '#E5E5E5'}`,
+        color: isDark ? '#F5F5F5' : '#0A0A0A',
       }}>
         <TimeToLeaveIcon sx={{ fontSize: 28 }} />
         <Box>
-          <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, lineHeight: 1.2 }}>
+          <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800, lineHeight: 1.2 }}>
             Smart Rental
           </Typography>
           <Typography variant="caption" sx={{ opacity: 0.8, fontSize: '0.7rem', fontWeight: 500, letterSpacing: 0.5 }}>
@@ -81,22 +81,20 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
                   borderRadius: 2,
                   py: 1.2,
                   px: 2,
-                  backgroundColor: active 
-                    ? (theme.palette.mode === 'light' ? '#eef2ff' : '#27272a') 
-                    : 'transparent',
-                  color: active 
-                    ? theme.palette.primary.main 
-                    : theme.palette.text.secondary,
+                  backgroundColor: active ? (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)') : 'transparent',
+                  color: active ? (isDark ? '#FFFFFF' : '#0A0A0A') : theme.palette.text.secondary,
+                  fontWeight: active ? 700 : 400,
                   '&:hover': {
-                    backgroundColor: theme.palette.mode === 'light' ? '#f1f5f9' : '#1f1f22',
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                    color: isDark ? '#FFFFFF' : '#0A0A0A',
                   },
-                  transition: 'all 0.2s ease',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 <ListItemIcon sx={{ 
                   minWidth: 40, 
-                  color: active ? theme.palette.primary.main : theme.palette.text.secondary,
-                  transition: 'all 0.2s ease',
+                  color: active ? (isDark ? '#FFFFFF' : '#0A0A0A') : theme.palette.text.secondary,
+                  transition: 'all 0.15s ease',
                 }}>
                   {item.icon}
                 </ListItemIcon>
@@ -141,24 +139,18 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
         sx={{
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          boxShadow: 'none',
-          backgroundColor: theme.palette.background.paper,
-          color: theme.palette.text.primary,
-          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="h6" noWrap component="div" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.25rem' }}>
+            <Typography variant="h6" noWrap component="div" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700, fontSize: '1.25rem' }}>
               {menuItems.find(item => item.id === currentPage)?.text || 'Smart Rental'}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
             <IconButton onClick={toggleLanguage} color="inherit" sx={{ p: 0.5 }}>
               {language === 'eng' ? (
-                <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
-                  <rect width={20} height={20} fill="#F5F5F5" />
-                  <rect width={1876} height={988} transform="translate(-1222 -900)" fill="white" />
+                <svg width={20} height={20} viewBox="0 0 20 20" fill="none" style={{ borderRadius: '50%', overflow: 'hidden' }}>
                   <path
                       d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z"
                       fill="#F0F0F0"
@@ -208,9 +200,7 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
                   />
                 </svg>
               ) : (
-                <svg width={20} height={20} viewBox="0 0 20 20" fill="none">
-                  <rect width={20} height={20} fill="#F5F5F5" />
-                  <rect width={1876} height={988} transform="translate(-1356 -380)" fill="white" />
+                <svg width={20} height={20} viewBox="0 0 20 20" fill="none" style={{ borderRadius: '50%', overflow: 'hidden' }}>
                   <path
                       d="M10 20C15.5228 20 20 15.5228 20 10C20 4.47715 15.5228 0 10 0C4.47715 0 0 4.47715 0 10C0 15.5228 4.47715 20 10 20Z"
                       fill="#F0F0F0"
@@ -258,13 +248,13 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
           left: 16,
           right: 16,
           height: 64,
-          backgroundColor: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(24, 24, 27, 0.85)',
+          backgroundColor: isDark ? 'rgba(10, 10, 10, 0.92)' : 'rgba(255, 255, 255, 0.92)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderRadius: '24px',
-          boxShadow: theme.palette.mode === 'light'
-            ? '0 10px 30px -10px rgba(79, 70, 229, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05)'
-            : '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(255, 255, 255, 0.02)',
+          boxShadow: isDark
+            ? '0 10px 30px -10px rgba(245, 197, 24, 0.15), 0 1px 3px rgba(0, 0, 0, 0.5)'
+            : '0 10px 30px -10px rgba(245, 197, 24, 0.2), 0 2px 8px rgba(0, 0, 0, 0.08)',
           border: `1px solid ${theme.palette.divider}`,
           zIndex: theme.zIndex.appBar,
           justifyContent: 'space-around',
@@ -303,7 +293,7 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
                     bottom: 4,
                     left: 6,
                     right: 6,
-                    backgroundColor: theme.palette.mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(129, 140, 248, 0.1)',
+                    backgroundColor: 'rgba(245, 197, 24, 0.15)',
                     borderRadius: '12px',
                     zIndex: -1,
                   }}

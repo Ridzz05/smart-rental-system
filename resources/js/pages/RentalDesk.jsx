@@ -11,13 +11,18 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
+// i18n
+import { useLanguage } from '../i18n/i18n';
+
 export default function RentalDesk() {
+  const { t } = useLanguage();
   const [vehicles, setVehicles] = useState([]);
   const [categories, setCategories] = useState([]);
   const [customers, setCustomers] = useState([]);
@@ -29,7 +34,6 @@ export default function RentalDesk() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
-  const [rentalStatus, setRentalStatus] = useState('Active');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   
@@ -58,7 +62,7 @@ export default function RentalDesk() {
       setCategories(cats);
     } catch (err) {
       console.error('Error fetching checkout data:', err);
-      showToast('Failed to load fleet or customer database', 'error');
+      showToast(t('rental_desk.toast_load_failed'), 'error');
     } finally {
       setLoading(false);
     }
@@ -87,7 +91,7 @@ export default function RentalDesk() {
 
   const handleSelectVehicle = (vehicle) => {
     if (vehicle.status !== 'Available') {
-      showToast('This vehicle is currently rented or under maintenance', 'warning');
+      showToast(t('rental_desk.toast_not_available'), 'warning');
       return;
     }
     setSelectedVehicle(vehicle);
@@ -111,19 +115,19 @@ export default function RentalDesk() {
   const handleCheckout = async (e) => {
     e.preventDefault();
     if (!selectedVehicle) {
-      showToast('Please select a vehicle to checkout', 'error');
+      showToast(t('rental_desk.toast_select_vehicle'), 'error');
       return;
     }
     if (!selectedCustomer) {
-      showToast('Please select a customer', 'error');
+      showToast(t('rental_desk.toast_select_customer'), 'error');
       return;
     }
     if (!startDate || !endDate) {
-      showToast('Please provide start and end dates', 'error');
+      showToast(t('rental_desk.toast_provide_dates'), 'error');
       return;
     }
     if (new Date(endDate) <= new Date(startDate)) {
-      showToast('Return date must be after pickup date', 'error');
+      showToast(t('rental_desk.toast_invalid_dates'), 'error');
       return;
     }
 
@@ -155,17 +159,17 @@ export default function RentalDesk() {
 
       const data = await response.json();
       if (response.status === 200 || response.status === 210) {
-        showToast('Rental transaction checked out successfully!');
+        showToast(t('rental_desk.toast_checkout_success'));
         setSelectedVehicle(null);
         setSelectedCustomer('');
         // Refresh fleet
         fetchData();
       } else {
-        showToast(data.message || 'Checkout failed', 'error');
+        showToast(data.message || t('rental_desk.toast_checkout_failed'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred during checkout', 'error');
+      showToast(t('rental_desk.toast_connection_error'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -184,8 +188,8 @@ export default function RentalDesk() {
   const filteredVehicles = vehicles.filter(v => {
     const matchesCategory = selectedCategory === 'All' || v.category.name === selectedCategory;
     const matchesSearch = v.brand.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          v.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          v.license_plate.toLowerCase().includes(searchQuery.toLowerCase());
+                           v.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           v.license_plate.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
@@ -205,7 +209,7 @@ export default function RentalDesk() {
           <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Search */}
             <TextField
-              placeholder="Search fleet (Innova, Avanza, Yamaha...)"
+              placeholder={t('rental_desk.search_placeholder')}
               variant="outlined"
               size="small"
               value={searchQuery}
@@ -225,7 +229,7 @@ export default function RentalDesk() {
               {categories.map((cat) => (
                 <Chip
                   key={cat}
-                  label={cat}
+                  label={cat === 'All' ? t('rentals.all_statuses') : cat}
                   onClick={() => setSelectedCategory(cat)}
                   color={selectedCategory === cat ? 'primary' : 'default'}
                   sx={{ 
@@ -290,13 +294,13 @@ export default function RentalDesk() {
                       <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, letterSpacing: 0.5 }}>
                         {vehicle.license_plate}
                       </Typography>
-                      <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, mt: 0.5 }}>
+                      <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700, mt: 0.5 }}>
                         {vehicle.brand} {vehicle.model}
                       </Typography>
                       <Divider sx={{ my: 1.5 }} />
                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="caption" color="text.secondary">
-                          DAILY RATE
+                          {t('fleet.daily_rate')}
                         </Typography>
                         <Typography variant="body1" sx={{ fontWeight: 800, color: 'primary.main' }}>
                           {formatCurrency(vehicle.daily_rate)}
@@ -325,8 +329,8 @@ export default function RentalDesk() {
               }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>
-                  Rental Checkout
+                <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700 }}>
+                  {t('rental_desk.title')}
                 </Typography>
                 <IconButton onClick={() => setSelectedVehicle(null)} size="small">
                   <CloseIcon />
@@ -345,10 +349,10 @@ export default function RentalDesk() {
                     {selectedVehicle.brand} {selectedVehicle.model}
                   </Typography>
                   <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                    Rate: {formatCurrency(selectedVehicle.daily_rate)}/day
+                    {t('fleet.daily_rate')}: {formatCurrency(selectedVehicle.daily_rate)}/{t('rental_desk.rate_per_day')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Plate: <strong>{selectedVehicle.license_plate}</strong>
+                    {t('dashboard.license_plate')}: <strong>{selectedVehicle.license_plate}</strong>
                   </Typography>
                 </Box>
               </Paper>
@@ -358,13 +362,13 @@ export default function RentalDesk() {
                   {/* Customer Search Dropdown */}
                   <TextField
                     select
-                    label="Select Customer"
+                    label={t('rental_desk.select_customer')}
                     value={selectedCustomer}
                     onChange={(e) => setSelectedCustomer(e.target.value)}
                     required
                     fullWidth
                   >
-                    <MenuItem value="" disabled>-- Choose Client --</MenuItem>
+                    <MenuItem value="" disabled>{t('rental_desk.choose_client')}</MenuItem>
                     {customers.map((c) => (
                       <MenuItem key={c.id} value={c.id}>
                         {c.name} ({c.phone})
@@ -374,7 +378,7 @@ export default function RentalDesk() {
 
                   {/* Start Date */}
                   <TextField
-                    label="Pickup Date"
+                    label={t('rental_desk.pickup_date')}
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
@@ -385,7 +389,7 @@ export default function RentalDesk() {
 
                   {/* End Date */}
                   <TextField
-                    label="Return Date"
+                    label={t('rental_desk.return_date')}
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
@@ -397,7 +401,7 @@ export default function RentalDesk() {
                   {/* Payment Method */}
                   <TextField
                     select
-                    label="Payment Method"
+                    label={t('rental_desk.payment_method')}
                     value={paymentMethod}
                     onChange={(e) => setPaymentMethod(e.target.value)}
                     required
@@ -413,16 +417,16 @@ export default function RentalDesk() {
                   {/* Price Calculation details summary */}
                   <Paper sx={{ p: 2, mt: 2, bgcolor: (theme) => theme.palette.mode === 'light' ? '#fafafa' : '#1f1f22', borderRadius: 2 }} variant="outlined">
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">Daily Rate</Typography>
+                      <Typography variant="body2" color="text.secondary">{t('fleet.daily_rate')}</Typography>
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>{formatCurrency(selectedVehicle.daily_rate)}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
-                      <Typography variant="body2" color="text.secondary">Rental Duration</Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{days} days</Typography>
+                      <Typography variant="body2" color="text.secondary">{t('rental_desk.duration')}</Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 600 }}>{days} {t('rental_desk.days')}</Typography>
                     </Box>
                     <Divider sx={{ my: 1.5 }} />
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Total Charge</Typography>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>{t('rental_desk.total_charge')}</Typography>
                       <Typography variant="h6" color="primary.main" sx={{ fontWeight: 800 }}>
                         {formatCurrency(total)}
                       </Typography>
@@ -437,7 +441,7 @@ export default function RentalDesk() {
                     endIcon={<ArrowForwardIcon />}
                     sx={{ py: 1.5, mt: 2, borderRadius: 2, fontWeight: 700 }}
                   >
-                    {submitting ? 'Checking out...' : 'Confirm Rental Checkout'}
+                    {submitting ? t('rental_desk.checking_out') : t('rental_desk.confirm_checkout')}
                   </Button>
                 </Box>
               </form>

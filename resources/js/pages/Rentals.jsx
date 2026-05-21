@@ -20,7 +20,11 @@ import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
+// i18n
+import { useLanguage } from "../i18n/i18n";
+
 export default function Rentals() {
+    const { t } = useLanguage();
     const [rentals, setRentals] = useState([]);
     const [statusFilter, setStatusFilter] = useState("All");
     const [loading, setLoading] = useState(true);
@@ -47,7 +51,7 @@ export default function Rentals() {
             })
             .catch((err) => {
                 console.error("Error fetching rentals:", err);
-                showToast("Failed to load rentals logs", "error");
+                showToast(t("rentals.toast_load_failed"), "error");
                 setLoading(false);
             });
     };
@@ -77,19 +81,14 @@ export default function Rentals() {
 
             const data = await response.json();
             if (response.ok) {
-                showToast(
-                    "Vehicle returned successfully and marked available!",
-                );
+                showToast(t("rentals.toast_return_success"));
                 fetchRentals();
             } else {
-                showToast(data.message || "Failed to process return", "error");
+                showToast(data.message || t("rentals.toast_return_failed"), "error");
             }
         } catch (err) {
             console.error(err);
-            showToast(
-                "A connection error occurred during return processing",
-                "error",
-            );
+            showToast(t("rentals.toast_connection_error"), "error");
         } finally {
             setProcessingId(null);
         }
@@ -119,6 +118,19 @@ export default function Rentals() {
                 return "error";
             default:
                 return "default";
+        }
+    };
+
+    const getStatusLabel = (status) => {
+        switch (status) {
+            case "Ongoing":
+                return t("rentals.ongoing_rented");
+            case "Completed":
+                return t("rentals.completed");
+            case "Cancelled":
+                return t("rentals.cancelled");
+            default:
+                return status;
         }
     };
 
@@ -152,22 +164,21 @@ export default function Rentals() {
                     <Typography
                         variant="h5"
                         sx={{
-                            fontFamily: "Outfit, sans-serif",
+                            fontFamily: '"Google Sans", sans-serif',
                             fontWeight: 800,
                         }}
                     >
-                        Rental Ledger Logs
+                        {t("rentals.title")}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Monitor, manage active rentals, and record customer
-                        returns.
+                        {t("rentals.subtitle")}
                     </Typography>
                 </Box>
 
                 {/* Status Filter */}
                 <TextField
                     select
-                    label="Filter Status"
+                    label={t("rentals.filter_status")}
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                     size="small"
@@ -177,10 +188,10 @@ export default function Rentals() {
                         borderRadius: 2,
                     }}
                 >
-                    <MenuItem value="All">All Statuses</MenuItem>
-                    <MenuItem value="Ongoing">Ongoing (Rented)</MenuItem>
-                    <MenuItem value="Completed">Completed</MenuItem>
-                    <MenuItem value="Cancelled">Cancelled</MenuItem>
+                    <MenuItem value="All">{t("rentals.all_statuses")}</MenuItem>
+                    <MenuItem value="Ongoing">{t("rentals.ongoing_rented")}</MenuItem>
+                    <MenuItem value="Completed">{t("rentals.completed")}</MenuItem>
+                    <MenuItem value="Cancelled">{t("rentals.cancelled")}</MenuItem>
                 </TextField>
             </Box>
 
@@ -206,28 +217,28 @@ export default function Rentals() {
                         >
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Log ID
+                                    {t("rentals.log_id")}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Vehicle
+                                    {t("rentals.vehicle")}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Customer
+                                    {t("rentals.customer")}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Rental Period
+                                    {t("rentals.rental_period")}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Total Cost
+                                    {t("rentals.total_cost")}
                                 </TableCell>
                                 <TableCell sx={{ fontWeight: 700 }}>
-                                    Status
+                                    {t("rentals.status")}
                                 </TableCell>
                                 <TableCell
                                     sx={{ fontWeight: 700 }}
                                     align="right"
                                 >
-                                    Actions
+                                    {t("rentals.actions")}
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -244,14 +255,13 @@ export default function Rentals() {
                                             color="text.secondary"
                                             sx={{ fontWeight: 600 }}
                                         >
-                                            No rental records found
+                                            {t("rentals.no_records")}
                                         </Typography>
                                         <Typography
                                             variant="body2"
                                             color="text.secondary"
                                         >
-                                            Try selecting a different status
-                                            filter.
+                                            {t("rentals.no_records_desc")}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -280,7 +290,7 @@ export default function Rentals() {
                                                 variant="caption"
                                                 color="text.secondary"
                                             >
-                                                Paid via:{" "}
+                                                {t("rentals.paid_via")}:{" "}
                                                 {rental.payment_method}
                                             </Typography>
                                         </TableCell>
@@ -296,7 +306,7 @@ export default function Rentals() {
                                                 variant="caption"
                                                 color="text.secondary"
                                             >
-                                                Plate:{" "}
+                                                {t("dashboard.license_plate")}:{" "}
                                                 <strong>
                                                     {
                                                         rental.vehicle
@@ -338,7 +348,7 @@ export default function Rentals() {
                                                         variant="caption"
                                                         color="text.secondary"
                                                     >
-                                                        Pickup
+                                                        {t("rentals.pickup")}
                                                     </Typography>
                                                 </Box>
                                                 <KeyboardArrowRightIcon
@@ -358,7 +368,7 @@ export default function Rentals() {
                                                         variant="caption"
                                                         color="text.secondary"
                                                     >
-                                                        Return
+                                                        {t("rentals.return")}
                                                     </Typography>
                                                 </Box>
                                             </Box>
@@ -379,12 +389,12 @@ export default function Rentals() {
                                                 variant="caption"
                                                 color="text.secondary"
                                             >
-                                                {rental.total_days} Days
+                                                {rental.total_days} {t("rental_desk.days")}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={rental.status}
+                                                label={getStatusLabel(rental.status)}
                                                 color={getStatusChipColor(
                                                     rental.status,
                                                 )}
@@ -420,8 +430,8 @@ export default function Rentals() {
                                                     }}
                                                 >
                                                     {processingId === rental.id
-                                                        ? "Processing..."
-                                                        : "Process Return"}
+                                                        ? t("rentals.processing")
+                                                        : t("rentals.process_return")}
                                                 </Button>
                                             ) : (
                                                 <Typography
@@ -429,13 +439,13 @@ export default function Rentals() {
                                                     color="text.secondary"
                                                     sx={{ fontStyle: "italic" }}
                                                 >
-                                                    Returned
+                                                    {t("rentals.returned")}
                                                 </Typography>
                                             )}
                                         </TableCell>
                                     </TableRow>
                                 ))
-                            )}
+                             )}
                         </TableBody>
                     </Table>
                 </TableContainer>

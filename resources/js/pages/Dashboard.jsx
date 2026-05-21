@@ -10,6 +10,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
 
+// i18n
+import { useLanguage } from '../i18n/i18n';
+import { useTheme } from '@mui/material/styles';
+
 // Icons
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import DepartureBoardIcon from '@mui/icons-material/DepartureBoard';
@@ -19,6 +23,9 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 export default function Dashboard({ setCurrentPage }) {
+  const { t } = useLanguage();
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -60,32 +67,28 @@ export default function Dashboard({ setCurrentPage }) {
   // Cards Data Configuration
   const cards = [
     {
-      title: "Total Revenue",
+      title: t('dashboard.total_revenue'),
       value: formatCurrency(stats.total_revenue),
-      icon: <AttachMoneyIcon sx={{ color: '#10b981', fontSize: 30 }} />,
-      bgColor: 'rgba(16, 185, 129, 0.1)',
-      desc: "All-time earnings"
+      icon: <AttachMoneyIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.revenue_desc')
     },
     {
-      title: "Vehicles on Road",
+      title: t('dashboard.vehicles_on_road'),
       value: stats.vehicles_on_road,
-      icon: <DepartureBoardIcon sx={{ color: '#6366f1', fontSize: 30 }} />,
-      bgColor: 'rgba(99, 102, 241, 0.1)',
-      desc: "Currently rented out"
+      icon: <DepartureBoardIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.vehicles_on_road_desc')
     },
     {
-      title: "Available Fleet",
+      title: t('dashboard.available_fleet'),
       value: stats.vehicles_available,
-      icon: <DoneAllIcon sx={{ color: '#3b82f6', fontSize: 30 }} />,
-      bgColor: 'rgba(59, 130, 246, 0.1)',
-      desc: "Ready for rental desk"
+      icon: <DoneAllIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.available_fleet_desc')
     },
     {
-      title: "Total Customers",
+      title: t('dashboard.total_customers'),
       value: stats.total_customers,
-      icon: <PeopleIcon sx={{ color: '#f59e0b', fontSize: 30 }} />,
-      bgColor: 'rgba(245, 158, 11, 0.1)',
-      desc: "Registered clients"
+      icon: <PeopleIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.total_customers_desc')
     }
   ];
 
@@ -99,55 +102,76 @@ export default function Dashboard({ setCurrentPage }) {
       <Box sx={{
         p: { xs: 3, md: 4 },
         mb: 4,
-        borderRadius: 4,
-        background: (theme) => theme.palette.mode === 'light'
-          ? 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)'
-          : 'linear-gradient(135deg, #18181b 0%, #27272a 100%)',
+        borderRadius: 3,
+        background: isDark ? '#1A1A1A' : '#FFFFFF',
         display: 'flex',
-        justifyContent: 'between',
+        justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 2,
-        border: (theme) => `1px solid ${theme.palette.mode === 'light' ? '#e2e8f0' : '#27272a'}`
+        border: `1px solid ${isDark ? '#2A2A2A' : '#E5E5E5'}`,
+        boxShadow: isDark
+          ? '0 4px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)'
+          : '0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
       }}>
         <Box>
-          <Typography variant="h4" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, mb: 1, color: (theme) => theme.palette.text.primary }}>
-            Welcome back, Alice!
+          <Typography variant="h4" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800, mb: 0.5, letterSpacing: '-0.02em' }}>
+            {t('dashboard.welcome_alice')}
           </Typography>
           <Typography variant="body1" color="text.secondary">
-            Here is the status of your vehicle rental operations today.
+            {t('dashboard.subtitle')}
           </Typography>
         </Box>
         <Button
           variant="contained"
           onClick={() => setCurrentPage('rental-desk')}
           startIcon={<LaunchIcon />}
-          sx={{ py: 1.2, px: 3, borderRadius: 2 }}
+          sx={{ py: 1.2, px: 3, borderRadius: 2, fontWeight: 700 }}
         >
-          Open Rental Desk
+          {t('dashboard.open_desk')}
         </Button>
       </Box>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — elevated cards that pop */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {cards.map((card, idx) => (
           <Grid item xs={12} sm={6} md={3} key={idx}>
-            <Card sx={{ height: '100%' }}>
-              <CardContent sx={{ display: 'flex', alignItems: 'center', gap: 2.5, p: 3 }}>
-                <Avatar sx={{ backgroundColor: card.bgColor, width: 56, height: 56, borderRadius: 3 }}>
+            <Card
+              elevation={3}
+              sx={{
+                height: '100%',
+                cursor: 'default',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: isDark
+                    ? '0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)'
+                    : '0 16px 48px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+                },
+              }}
+            >
+              <CardContent sx={{ p: 3 }}>
+                <Box sx={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 44,
+                  height: 44,
+                  borderRadius: 2,
+                  mb: 2.5,
+                  background: isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.05)',
+                  color: 'text.primary',
+                }}>
                   {card.icon}
-                </Avatar>
-                <Box>
-                  <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.75rem' }}>
-                    {card.title}
-                  </Typography>
-                  <Typography variant="h5" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, my: 0.5 }}>
-                    {card.value}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    {card.desc}
-                  </Typography>
                 </Box>
+                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'block', mb: 1 }}>
+                  {card.title}
+                </Typography>
+                <Typography variant="h4" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.1, mb: 0.5 }}>
+                  {card.value}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {card.desc}
+                </Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -159,8 +183,8 @@ export default function Dashboard({ setCurrentPage }) {
         {/* Revenue SVG Chart */}
         <Grid item xs={12} md={8}>
           <Card sx={{ height: '100%', p: 3 }}>
-            <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, mb: 3 }}>
-              Monthly Revenue Performance
+            <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700, mb: 3 }}>
+              {t('dashboard.chart_title')}
             </Typography>
 
             {/* Custom SVG Bar Chart */}
@@ -178,12 +202,16 @@ export default function Dashboard({ setCurrentPage }) {
                       <Box sx={{
                         height: `${percentageHeight}%`,
                         width: '100%',
-                        background: 'linear-gradient(to top, #6366f1, #818cf8)',
+                        background: isDark
+                          ? 'linear-gradient(to top, #525252, #A3A3A3)'
+                          : 'linear-gradient(to top, #0A0A0A, #525252)',
                         borderRadius: '6px 6px 0 0',
                         transition: 'height 0.8s ease',
                         cursor: 'pointer',
                         '&:hover': {
-                          background: 'linear-gradient(to top, #4f46e5, #6366f1)',
+                          background: isDark
+                            ? 'linear-gradient(to top, #737373, #D4D4D4)'
+                            : 'linear-gradient(to top, #262626, #737373)',
                         }
                       }} />
                       {/* Axis Label */}
@@ -203,8 +231,8 @@ export default function Dashboard({ setCurrentPage }) {
           <Card sx={{ height: '100%', p: 3, display: 'flex', flexDirection: 'column' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
               <NotificationsActiveIcon sx={{ color: '#f59e0b' }} />
-              <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>
-                Upcoming Return Alerts
+              <Typography variant="h6" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700 }}>
+                {t('dashboard.alerts_title')}
               </Typography>
             </Box>
 
@@ -215,10 +243,10 @@ export default function Dashboard({ setCurrentPage }) {
                     <DoneAllIcon sx={{ color: '#10b981' }} />
                   </Avatar>
                   <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    No pending returns
+                    {t('dashboard.no_pending')}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    All rented vehicles are currently within schedule.
+                    {t('dashboard.no_pending_desc')}
                   </Typography>
                 </Box>
               ) : (
@@ -228,13 +256,13 @@ export default function Dashboard({ setCurrentPage }) {
                   const diffTime = end - today;
                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-                  let chipLabel = `${diffDays} days left`;
+                  let chipLabel = `${diffDays} ${t('dashboard.days_left')}`;
                   let chipColor = 'primary';
                   if (diffDays <= 0) {
-                    chipLabel = "Overdue";
+                    chipLabel = t('dashboard.overdue');
                     chipColor = "error";
                   } else if (diffDays === 1) {
-                    chipLabel = "Due tomorrow";
+                    chipLabel = t('dashboard.due_tomorrow');
                     chipColor = "warning";
                   }
 
@@ -249,10 +277,10 @@ export default function Dashboard({ setCurrentPage }) {
                           {rental.vehicle.brand} {rental.vehicle.model}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Customer: {rental.customer.name}
+                          {t('dashboard.customer')}: {rental.customer.name}
                         </Typography>
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
-                          License Plate: <strong>{rental.vehicle.license_plate}</strong>
+                          {t('dashboard.license_plate')}: <strong>{rental.vehicle.license_plate}</strong>
                         </Typography>
                       </Box>
                       <Chip label={chipLabel} color={chipColor} size="small" sx={{ fontWeight: 600, borderRadius: 1 }} />
@@ -269,7 +297,7 @@ export default function Dashboard({ setCurrentPage }) {
                 onClick={() => setCurrentPage('rentals')}
                 sx={{ mt: 3, borderRadius: 2 }}
               >
-                Manage Active Rentals
+                {t('dashboard.manage_rentals')}
               </Button>
             )}
           </Card>

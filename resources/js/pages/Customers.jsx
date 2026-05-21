@@ -25,7 +25,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
+// i18n
+import { useLanguage } from '../i18n/i18n';
+
 export default function Customers() {
+  const { t } = useLanguage();
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -59,7 +63,7 @@ export default function Customers() {
       })
       .catch(err => {
         console.error(err);
-        showToast('Failed to load customer list', 'error');
+        showToast(t('customers.toast_load_failed'), 'error');
         setLoading(false);
       });
   };
@@ -99,7 +103,7 @@ export default function Customers() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this customer record?')) return;
+    if (!window.confirm(t('customers.confirm_delete'))) return;
     try {
       const response = await fetch(`/api/customers/${id}`, {
         method: 'DELETE',
@@ -109,15 +113,15 @@ export default function Customers() {
         }
       });
       if (response.ok) {
-        showToast('Customer record deleted successfully');
+        showToast(t('customers.toast_delete_success'));
         fetchCustomers();
       } else {
         const data = await response.json();
-        showToast(data.message || 'Failed to delete customer', 'error');
+        showToast(data.message || t('customers.toast_connection_error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred', 'error');
+      showToast(t('customers.toast_connection_error'), 'error');
     }
   };
 
@@ -141,15 +145,15 @@ export default function Customers() {
       
       const data = await response.json();
       if (response.ok) {
-        showToast(editMode ? 'Customer record updated successfully!' : 'New customer registered successfully!');
+        showToast(editMode ? t('customers.toast_update_success') : t('customers.toast_register_success'));
         setOpenDialog(false);
         fetchCustomers();
       } else {
-        showToast(data.message || 'Validation error', 'error');
+        showToast(data.message || t('customers.toast_validation_error'), 'error');
       }
     } catch (err) {
       console.error(err);
-      showToast('A connection error occurred', 'error');
+      showToast(t('customers.toast_connection_error'), 'error');
     } finally {
       setSubmitting(false);
     }
@@ -176,11 +180,11 @@ export default function Customers() {
       {/* Header Panel */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
         <Box>
-          <Typography variant="h5" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800 }}>
-            Customer Base (CRM)
+          <Typography variant="h5" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800 }}>
+            {t('customers.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            Register and manage customer profiles, driver's licenses, and contact information.
+            {t('customers.subtitle')}
           </Typography>
         </Box>
         <Button
@@ -189,7 +193,7 @@ export default function Customers() {
           onClick={handleOpenAdd}
           sx={{ borderRadius: 2, py: 1 }}
         >
-          Register Customer
+          {t('customers.register')}
         </Button>
       </Box>
 
@@ -197,7 +201,7 @@ export default function Customers() {
       <Card sx={{ border: 'none', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.02)' }}>
         <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'start' }}>
           <TextField
-            placeholder="Search customers (Name, Phone, Email, License...)"
+            placeholder={t('customers.search_placeholder')}
             variant="outlined"
             size="small"
             value={searchQuery}
@@ -219,11 +223,11 @@ export default function Customers() {
           <Table sx={{ minWidth: 650 }}>
             <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8fafc' : '#1e1e24' }}>
               <TableRow>
-                <TableCell sx={{ fontWeight: 700 }}>Client Details</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Contact Info</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Driver's License (SIM)</TableCell>
-                <TableCell sx={{ fontWeight: 700 }}>Full Address</TableCell>
-                <TableCell sx={{ fontWeight: 700 }} align="right">Actions</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>{t('customers.client_details')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>{t('customers.contact_info')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>{t('customers.drivers_license')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }}>{t('customers.full_address')}</TableCell>
+                <TableCell sx={{ fontWeight: 700 }} align="right">{t('customers.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -231,7 +235,7 @@ export default function Customers() {
                 <TableRow>
                   <TableCell colSpan={5} align="center" sx={{ py: 6 }}>
                     <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      No customers registered
+                      {t('customers.no_customers')}
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -243,7 +247,7 @@ export default function Customers() {
                         {customer.name}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
-                        Client ID: #CUST-{String(customer.id).padStart(4, '0')}
+                        {t('customers.client_id')}: #CUST-{String(customer.id).padStart(4, '0')}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -251,17 +255,17 @@ export default function Customers() {
                         {customer.phone}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
-                        {customer.email || 'No email provided'}
+                        {customer.email || t('customers.no_email')}
                       </Typography>
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                        {customer.driver_license || 'Not recorded'}
+                        {customer.driver_license || t('customers.not_recorded')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ maxWidth: 220 }}>
                       <Typography variant="body2" noWrap title={customer.address}>
-                        {customer.address || 'No address provided'}
+                        {customer.address || t('customers.no_address')}
                       </Typography>
                     </TableCell>
                     <TableCell align="right">
@@ -273,7 +277,7 @@ export default function Customers() {
                           onClick={() => handleOpenEdit(customer)}
                           sx={{ borderRadius: 1.5, py: 0.5 }}
                         >
-                          Edit
+                          {t('common.edit')}
                         </Button>
                         <Button
                           variant="outlined"
@@ -296,13 +300,13 @@ export default function Customers() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700 }}>
-          {editMode ? 'Edit Customer Information' : 'Register New Customer'}
+        <DialogTitle sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 700 }}>
+          {editMode ? t('customers.edit_title') : t('customers.register_title')}
         </DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
             <TextField
-              label="Full Name"
+              label={t('customers.full_name')}
               placeholder="e.g. John Doe"
               value={currentCustomer.name}
               onChange={(e) => setCurrentCustomer({ ...currentCustomer, name: e.target.value })}
@@ -310,7 +314,7 @@ export default function Customers() {
               fullWidth
             />
             <TextField
-              label="Phone Number"
+              label={t('customers.phone_number')}
               placeholder="e.g. 081234567890"
               value={currentCustomer.phone}
               onChange={(e) => setCurrentCustomer({ ...currentCustomer, phone: e.target.value })}
@@ -318,7 +322,7 @@ export default function Customers() {
               fullWidth
             />
             <TextField
-              label="Email Address (Optional)"
+              label={t('customers.email_address')}
               type="email"
               placeholder="e.g. john@example.com"
               value={currentCustomer.email}
@@ -326,7 +330,7 @@ export default function Customers() {
               fullWidth
             />
             <TextField
-              label="Driver's License (SIM) Number"
+              label={t('customers.sim_number')}
               placeholder="e.g. 1234-5678-901234"
               value={currentCustomer.driver_license}
               onChange={(e) => setCurrentCustomer({ ...currentCustomer, driver_license: e.target.value })}
@@ -334,7 +338,7 @@ export default function Customers() {
               fullWidth
             />
             <TextField
-              label="Residential Address"
+              label={t('customers.residential_address')}
               multiline
               rows={3}
               placeholder="e.g. Jl. Sudirman No. 12, Jakarta"
@@ -344,14 +348,14 @@ export default function Customers() {
             />
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
-            <Button onClick={() => setOpenDialog(false)} color="inherit">Cancel</Button>
+            <Button onClick={() => setOpenDialog(false)} color="inherit">{t('common.cancel')}</Button>
             <Button 
               type="submit" 
               variant="contained" 
               disabled={submitting}
               sx={{ borderRadius: 2 }}
             >
-              {submitting ? 'Saving...' : 'Save Customer'}
+              {submitting ? t('rentals.processing') : t('customers.save_customer')}
             </Button>
           </DialogActions>
         </form>
