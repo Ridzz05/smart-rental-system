@@ -221,7 +221,10 @@ export default function Fleet() {
                 display: 'flex', 
                 flexDirection: 'column',
                 transition: 'all 0.2s ease',
-                '&:hover': { transform: 'translateY(-3px)', boxShadow: '0 8px 24px rgba(0,0,0,0.04)' }
+                '&:hover': {
+                  transform: 'translateY(-2px)',
+                  boxShadow: (theme) => theme.shadows[2],
+                }
               }}>
                 {/* Vehicle Thumbnail */}
                 <Box sx={{ position: 'relative', height: 160, overflow: 'hidden', bgcolor: 'grey.100' }}>

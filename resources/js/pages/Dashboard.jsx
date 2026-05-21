@@ -137,15 +137,13 @@ export default function Dashboard({ setCurrentPage }) {
         {cards.map((card, idx) => (
           <Grid item xs={12} sm={6} md={3} key={idx}>
             <Card
-              elevation={3}
+              elevation={1}
               sx={{
                 height: '100%',
                 cursor: 'default',
                 '&:hover': {
-                  transform: 'translateY(-4px)',
-                  boxShadow: isDark
-                    ? '0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)'
-                    : '0 16px 48px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: (theme) => theme.shadows[2],
                 },
               }}
             >

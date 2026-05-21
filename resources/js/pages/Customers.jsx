@@ -198,7 +198,7 @@ export default function Customers() {
       </Box>
 
       {/* Search and Table Card */}
-      <Card sx={{ border: 'none', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.02)' }}>
+      <Card>
         <Box sx={{ p: 2.5, display: 'flex', justifyContent: 'start' }}>
           <TextField
             placeholder={t('customers.search_placeholder')}

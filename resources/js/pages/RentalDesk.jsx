@@ -258,15 +258,15 @@ export default function RentalDesk() {
                       cursor: isAvailable ? 'pointer' : 'not-allowed',
                       opacity: isAvailable ? 1 : 0.65,
                       border: isSelected 
-                        ? (theme) => `2px solid ${theme.palette.primary.main}` 
-                        : (theme) => `1px solid ${theme.palette.divider}`,
+                        ? (theme) => `2px solid ${theme.palette.text.primary}` 
+                        : undefined,
                       boxShadow: isSelected 
-                        ? '0 4px 20px rgba(99, 102, 241, 0.15)' 
-                        : 'none',
+                        ? (isDark ? '0 2px 8px rgba(255, 255, 255, 0.1)' : '0 2px 8px rgba(0, 0, 0, 0.05)')
+                        : undefined,
                       '&:hover': isAvailable ? {
-                        transform: 'translateY(-3px)',
-                        boxShadow: '0 8px 30px rgba(0, 0, 0, 0.05)',
-                        borderColor: isSelected ? 'primary.main' : 'divider'
+                        transform: 'translateY(-2px)',
+                        boxShadow: (theme) => theme.shadows[2],
+                        borderColor: isSelected ? 'text.primary' : undefined
                       } : {},
                       transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}
@@ -324,8 +324,6 @@ export default function RentalDesk() {
                 top: 84, 
                 maxHeight: 'calc(100vh - 120px)', 
                 overflowY: 'auto',
-                border: (theme) => `1px solid ${theme.palette.divider}`,
-                boxShadow: '0 4px 30px rgba(0, 0, 0, 0.03)'
               }}
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>

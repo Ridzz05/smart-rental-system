@@ -32,5 +32,5 @@ Route::prefix('api')->group(function () {
 
 // 2. SPA Fallback Route
 Route::fallback(function () {
-    return view('welcome');
+    return view('app');
 });

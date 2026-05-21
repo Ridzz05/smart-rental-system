@@ -77,25 +77,25 @@ function App() {
       body1: { lineHeight: 1.65 },
       button: { textTransform: 'none', fontWeight: 600, letterSpacing: '0.01em' },
     },
-    shape: { borderRadius: 14 },
+    shape: { borderRadius: 12 },
     shadows: [
       'none',
-      // Elevation 1 – subtle card
+      // Elevation 1 – subtle card shadow
       isDark
-        ? '0 1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)'
-        : '0 1px 3px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04)',
+        ? '0 1px 3px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.02)'
+        : '0 1px 3px rgba(0,0,0,0.02), 0 1px 2px rgba(0,0,0,0.04)',
       // Elevation 2 – normal card
       isDark
-        ? '0 4px 12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)'
-        : '0 4px 16px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06)',
-      // Elevation 3 – dashboard stat card (pop)
+        ? '0 3px 8px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)'
+        : '0 2px 8px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.03)',
+      // Elevation 3 – dashboard stat card
       isDark
-        ? '0 8px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.07)'
-        : '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+        ? '0 6px 16px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05)'
+        : '0 4px 14px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.03)',
       // Elevation 4 – hover
       isDark
-        ? '0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)'
-        : '0 16px 48px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)',
+        ? '0 10px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)'
+        : '0 8px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
       ...Array(20).fill('none'),
     ],
     components: {
@@ -111,7 +111,7 @@ function App() {
         defaultProps: { disableElevation: true },
         styleOverrides: {
           root: {
-            borderRadius: 10,
+            borderRadius: 8,
             fontWeight: 600,
             '&:hover': { boxShadow: 'none' },
           },
@@ -123,7 +123,7 @@ function App() {
             },
           },
           outlinedPrimary: {
-            borderColor: isDark ? '#3A3A3A' : '#D1D1D1',
+            borderColor: isDark ? '#3A3A3A' : '#E5E5E5',
             color:       isDark ? '#FFFFFF'  : '#0A0A0A',
             '&:hover': {
               borderColor: isDark ? '#FFFFFF' : '#0A0A0A',
@@ -137,11 +137,11 @@ function App() {
         },
       },
       MuiCard: {
-        defaultProps: { elevation: 2 },
+        defaultProps: { elevation: 1 },
         styleOverrides: {
           root: {
             background: isDark ? '#1A1A1A' : '#FFFFFF',
-            border: `1px solid ${isDark ? '#2A2A2A' : '#F0F0F0'}`,
+            border: `1px solid ${isDark ? '#222222' : '#EAEAEA'}`,
             transition: 'box-shadow 0.2s ease, transform 0.2s ease',
           },
         },

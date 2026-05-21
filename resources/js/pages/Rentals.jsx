@@ -196,12 +196,7 @@ export default function Rentals() {
             </Box>
 
             {/* Table Log Ledger */}
-            <Card
-                sx={{
-                    border: "none",
-                    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.02)",
-                }}
-            >
+            <Card>
                 <TableContainer
                     component={Paper}
                     sx={{ border: "none", boxShadow: "none" }}
