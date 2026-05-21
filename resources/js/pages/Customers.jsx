@@ -24,6 +24,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // i18n
 import { useLanguage } from '../i18n/i18n';
@@ -48,6 +49,7 @@ export default function Customers() {
 
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
   useEffect(() => {
     fetchCustomers();
@@ -102,8 +104,13 @@ export default function Customers() {
     setOpenDialog(true);
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm(t('customers.confirm_delete'))) return;
+  const handleDeleteClick = (id) => {
+    setDeleteConfirm({ open: true, id });
+  };
+
+  const handleConfirmDelete = async () => {
+    const id = deleteConfirm.id;
+    setDeleteConfirm({ open: false, id: null });
     try {
       const response = await fetch(`/api/customers/${id}`, {
         method: 'DELETE',
@@ -283,7 +290,7 @@ export default function Customers() {
                           variant="outlined"
                           color="error"
                           size="small"
-                          onClick={() => handleDelete(customer.id)}
+                          onClick={() => handleDeleteClick(customer.id)}
                           sx={{ minWidth: 40, p: 0, borderRadius: 1.5 }}
                         >
                           <DeleteOutlineIcon fontSize="small" />
@@ -372,6 +379,18 @@ export default function Customers() {
           {toast.message}
         </Alert>
       </Snackbar>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        title={t('common.confirm') || 'Konfirmasi'}
+        message={t('customers.confirm_delete')}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteConfirm({ open: false, id: null })}
+        confirmText={t('common.delete') || 'Hapus'}
+        cancelText={t('common.cancel') || 'Batal'}
+        severity="error"
+      />
     </Box>
   );
 }

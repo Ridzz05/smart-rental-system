@@ -20,6 +20,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // i18n
 import { useLanguage } from '../i18n/i18n';
@@ -44,6 +45,7 @@ export default function Fleet() {
   
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
 
   useEffect(() => {
     fetchVehicles();
@@ -106,8 +108,13 @@ export default function Fleet() {
     }
   };
 
-  const handleDeleteVehicle = async (id) => {
-    if (!window.confirm(t('fleet.confirm_delete'))) return;
+  const handleDeleteClick = (id) => {
+    setDeleteConfirm({ open: true, id });
+  };
+
+  const handleConfirmDelete = async () => {
+    const id = deleteConfirm.id;
+    setDeleteConfirm({ open: false, id: null });
     try {
       const response = await fetch(`/api/vehicles/${id}`, {
         method: 'DELETE',
@@ -281,7 +288,7 @@ export default function Fleet() {
                       color="error"
                       size="small"
                       disabled={isRented}
-                      onClick={() => handleDeleteVehicle(vehicle.id)}
+                      onClick={() => handleDeleteClick(vehicle.id)}
                       sx={{ minWidth: 40, p: 0, borderRadius: 1.5 }}
                     >
                       <DeleteOutlineIcon fontSize="small" />
@@ -394,6 +401,18 @@ export default function Fleet() {
           {toast.message}
         </Alert>
       </Snackbar>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={deleteConfirm.open}
+        title={t('common.confirm') || 'Konfirmasi'}
+        message={t('fleet.confirm_delete')}
+        onConfirm={handleConfirmDelete}
+        onCancel={() => setDeleteConfirm({ open: false, id: null })}
+        confirmText={t('common.delete') || 'Hapus'}
+        cancelText={t('common.cancel') || 'Batal'}
+        severity="error"
+      />
     </Box>
   );
 }
