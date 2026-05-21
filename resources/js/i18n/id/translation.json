@@ -1,0 +1,26 @@
+{
+  "menu": {
+    "dashboard": "Dasbor",
+    "rental_desk": "Meja Penyewaan",
+    "rentals": "Log Penyewaan",
+    "fleet": "Pengelola Armada",
+    "customers": "Daftar Pelanggan"
+  },
+  "dashboard": {
+    "title": "Dasbor",
+    "total_fleet": "Total Armada",
+    "active_rentals": "Sewa Aktif",
+    "available_cars": "Mobil Tersedia",
+    "revenue": "Pendapatan"
+  },
+  "common": {
+    "search": "Cari...",
+    "add": "Tambah Baru",
+    "edit": "Ubah",
+    "delete": "Hapus",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "language": "Bahasa",
+    "settings": "Pengaturan"
+  }
+}

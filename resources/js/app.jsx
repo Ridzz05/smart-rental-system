@@ -8,6 +8,7 @@ import RentalDesk from './pages/RentalDesk';
 import Fleet from './pages/Fleet';
 import Customers from './pages/Customers';
 import Rentals from './pages/Rentals';
+import { LanguageProvider } from './i18n/i18n';
 
 function App() {
   const [mode, setMode] = useState(() => {
@@ -26,8 +27,7 @@ function App() {
   }, [mode]);
 
   const toggleColorMode = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'auto'));
-    setMode((prevMode) => (prevMode === 'auto' ? 'dark' : 'light'));
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
   // Custom MUI Theme
@@ -108,17 +108,19 @@ function App() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Layout 
-        currentPage={currentPage} 
-        setCurrentPage={setCurrentPage} 
-        mode={mode} 
-        toggleColorMode={toggleColorMode}
-      >
-        {renderPage()}
-      </Layout>
-    </ThemeProvider>
+    <LanguageProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Layout 
+          currentPage={currentPage} 
+          setCurrentPage={setCurrentPage} 
+          mode={mode} 
+          toggleColorMode={toggleColorMode}
+        >
+          {renderPage()}
+        </Layout>
+      </ThemeProvider>
+    </LanguageProvider>
   );
 }
 

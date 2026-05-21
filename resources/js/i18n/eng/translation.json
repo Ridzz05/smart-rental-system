@@ -1,0 +1,26 @@
+{
+  "menu": {
+    "dashboard": "Dashboard",
+    "rental_desk": "Rental Desk",
+    "rentals": "Rentals Logs",
+    "fleet": "Fleet Manager",
+    "customers": "Customer Base"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "total_fleet": "Total Fleet",
+    "active_rentals": "Active Rentals",
+    "available_cars": "Available Cars",
+    "revenue": "Revenue"
+  },
+  "common": {
+    "search": "Search...",
+    "add": "Add New",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "language": "Language",
+    "settings": "Settings"
+  }
+}
