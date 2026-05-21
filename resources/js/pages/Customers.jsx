@@ -43,7 +43,7 @@ export default function Customers() {
     email: '',
     phone: '',
     address: '',
-    driver_license: ''
+    identity_number: ''
   });
 
   const [submitting, setSubmitting] = useState(false);
@@ -84,7 +84,7 @@ export default function Customers() {
       email: '',
       phone: '',
       address: '',
-      driver_license: ''
+      identity_number: ''
     });
     setOpenDialog(true);
   };
@@ -97,7 +97,7 @@ export default function Customers() {
       email: customer.email || '',
       phone: customer.phone,
       address: customer.address || '',
-      driver_license: customer.driver_license || ''
+      identity_number: customer.identity_number || ''
     });
     setOpenDialog(true);
   };
@@ -178,8 +178,8 @@ export default function Customers() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Header Panel */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
+      <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-end', sm: 'space-between' }, alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <Typography variant="h5" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800 }}>
             {t('customers.title')}
           </Typography>
@@ -191,7 +191,7 @@ export default function Customers() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={handleOpenAdd}
-          sx={{ borderRadius: 2, py: 1 }}
+          sx={{ borderRadius: 2, py: 1, width: { xs: '100%', sm: 'auto' } }}
         >
           {t('customers.register')}
         </Button>
@@ -260,7 +260,7 @@ export default function Customers() {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                        {customer.driver_license || t('customers.not_recorded')}
+                        {customer.identity_number || t('customers.not_recorded')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ maxWidth: 220 }}>
@@ -332,8 +332,8 @@ export default function Customers() {
             <TextField
               label={t('customers.sim_number')}
               placeholder="e.g. 1234-5678-901234"
-              value={currentCustomer.driver_license}
-              onChange={(e) => setCurrentCustomer({ ...currentCustomer, driver_license: e.target.value })}
+              value={currentCustomer.identity_number}
+              onChange={(e) => setCurrentCustomer({ ...currentCustomer, identity_number: e.target.value })}
               required
               fullWidth
             />

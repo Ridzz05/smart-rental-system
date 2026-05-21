@@ -73,7 +73,7 @@ class RentalController extends Controller
 
             DB::commit();
 
-            return response()->json($rental->load(['vehicle.category', 'customer']), 210);
+            return response()->json($rental->load(['vehicle.category', 'customer']), 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([

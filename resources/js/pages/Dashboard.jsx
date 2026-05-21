@@ -98,21 +98,16 @@ export default function Dashboard({ setCurrentPage }) {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* Welcome Banner */}
-      <Box sx={{
+      {/* Welcome Banner Card Widget */}
+      <Card sx={{
         p: { xs: 3, md: 4 },
         mb: 4,
         borderRadius: 3,
-        background: isDark ? '#1A1A1A' : '#FFFFFF',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: 2,
-        border: `1px solid ${isDark ? '#2A2A2A' : '#E5E5E5'}`,
-        boxShadow: isDark
-          ? '0 4px 12px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05)'
-          : '0 4px 20px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04)',
       }}>
         <Box>
           <Typography variant="h4" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800, mb: 0.5, letterSpacing: '-0.02em' }}>
@@ -130,14 +125,13 @@ export default function Dashboard({ setCurrentPage }) {
         >
           {t('dashboard.open_desk')}
         </Button>
-      </Box>
+      </Card>
 
       {/* Stats Grid — elevated cards that pop */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         {cards.map((card, idx) => (
           <Grid item xs={12} sm={6} md={3} key={idx}>
             <Card
-              elevation={1}
               sx={{
                 height: '100%',
                 cursor: 'default',

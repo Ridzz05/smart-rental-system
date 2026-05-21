@@ -155,12 +155,14 @@ export default function Rentals() {
             <Box
                 sx={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    flexDirection: { xs: "column", sm: "row" },
+                    justifyContent: { xs: "flex-end", sm: "space-between" },
+                    alignItems: { xs: "stretch", sm: "center" },
+                    gap: 2,
                     mb: 3,
                 }}
             >
-                <Box>
+                <Box sx={{ display: { xs: "none", md: "block" } }}>
                     <Typography
                         variant="h5"
                         sx={{
@@ -183,9 +185,10 @@ export default function Rentals() {
                     onChange={(e) => setStatusFilter(e.target.value)}
                     size="small"
                     sx={{
-                        minWidth: 180,
+                        minWidth: { xs: "100%", sm: 180 },
                         bgcolor: "background.paper",
                         borderRadius: 2,
+                        alignSelf: { xs: "stretch", sm: "auto" }
                     }}
                 >
                     <MenuItem value="All">{t("rentals.all_statuses")}</MenuItem>

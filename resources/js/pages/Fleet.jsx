@@ -189,8 +189,8 @@ export default function Fleet() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Header Area */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
-        <Box>
+      <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-end', sm: 'space-between' }, alignItems: 'center', mb: 4, flexWrap: 'wrap', gap: 2 }}>
+        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
           <Typography variant="h5" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800 }}>
             {t('fleet.title')}
           </Typography>
@@ -202,7 +202,7 @@ export default function Fleet() {
           variant="contained"
           startIcon={<AddIcon />}
           onClick={() => setOpenAdd(true)}
-          sx={{ borderRadius: 2, py: 1 }}
+          sx={{ borderRadius: 2, py: 1, width: { xs: '100%', sm: 'auto' } }}
         >
           {t('fleet.add_vehicle')}
         </Button>
@@ -240,7 +240,7 @@ export default function Fleet() {
                     sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700, borderRadius: 1 }}
                   />
                   <Chip
-                    label={vehicle.category.name}
+                    label={vehicle.category?.name || 'Uncategorized'}
                     color="secondary"
                     size="small"
                     sx={{ position: 'absolute', bottom: 12, left: 12, fontWeight: 700, borderRadius: 1 }}

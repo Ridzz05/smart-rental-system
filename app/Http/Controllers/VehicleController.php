@@ -27,7 +27,7 @@ class VehicleController extends Controller
         ]);
 
         $vehicle = Vehicle::create($validated);
-        return response()->json($vehicle->load('category'), 210);
+        return response()->json($vehicle->load('category'), 201);
     }
 
     public function update(Request $request, Vehicle $vehicle): JsonResponse

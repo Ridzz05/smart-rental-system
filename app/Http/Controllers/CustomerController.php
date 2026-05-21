@@ -24,7 +24,7 @@ class CustomerController extends Controller
         ]);
 
         $customer = Customer::create($validated);
-        return response()->json($customer, 210);
+        return response()->json($customer, 201);
     }
 
     public function update(Request $request, Customer $customer): JsonResponse

@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import Chip from '@mui/material/Chip';
 import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
 import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,11 +18,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import Avatar from '@mui/material/Avatar';
+import { useTheme } from '@mui/material/styles';
 
 // i18n
 import { useLanguage } from '../i18n/i18n';
 
 export default function RentalDesk() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === 'dark';
   const { t } = useLanguage();
   const [vehicles, setVehicles] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -58,7 +63,7 @@ export default function RentalDesk() {
       setCustomers(cData);
       
       // Extract unique categories from vehicle data
-      const cats = ['All', ...new Set(vData.map(v => v.category.name))];
+      const cats = ['All', ...new Set(vData.map(v => v.category?.name).filter(Boolean))];
       setCategories(cats);
     } catch (err) {
       console.error('Error fetching checkout data:', err);
@@ -157,14 +162,14 @@ export default function RentalDesk() {
         })
       });
 
-      const data = await response.json();
-      if (response.status === 200 || response.status === 210) {
+      if (response.ok) {
         showToast(t('rental_desk.toast_checkout_success'));
         setSelectedVehicle(null);
         setSelectedCustomer('');
         // Refresh fleet
         fetchData();
       } else {
+        const data = await response.json();
         showToast(data.message || t('rental_desk.toast_checkout_failed'), 'error');
       }
     } catch (err) {
@@ -186,7 +191,7 @@ export default function RentalDesk() {
 
   // Filter logic
   const filteredVehicles = vehicles.filter(v => {
-    const matchesCategory = selectedCategory === 'All' || v.category.name === selectedCategory;
+    const matchesCategory = selectedCategory === 'All' || v.category?.name === selectedCategory;
     const matchesSearch = v.brand.toLowerCase().includes(searchQuery.toLowerCase()) || 
                            v.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
                            v.license_plate.toLowerCase().includes(searchQuery.toLowerCase());
@@ -284,7 +289,7 @@ export default function RentalDesk() {
                         sx={{ position: 'absolute', top: 12, right: 12, fontWeight: 700, borderRadius: 1 }}
                       />
                       <Chip
-                        label={vehicle.category.name}
+                        label={vehicle.category?.name || 'Uncategorized'}
                         color="secondary"
                         size="small"
                         sx={{ position: 'absolute', bottom: 12, left: 12, fontWeight: 700, borderRadius: 1 }}

@@ -137,11 +137,13 @@ function App() {
         },
       },
       MuiCard: {
-        defaultProps: { elevation: 1 },
+        defaultProps: { elevation: 0 },
         styleOverrides: {
           root: {
-            background: isDark ? '#1A1A1A' : '#FFFFFF',
-            border: `1px solid ${isDark ? '#222222' : '#EAEAEA'}`,
+            background: isDark ? 'rgba(26, 26, 26, 0.65)' : 'rgba(255, 255, 255, 0.7)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: `1px solid ${isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'}`,
             transition: 'box-shadow 0.2s ease, transform 0.2s ease',
           },
         },

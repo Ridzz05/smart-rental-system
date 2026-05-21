@@ -223,7 +223,11 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
       {/* Sidebar Drawers */}
       <Box
         component="nav"
-        sx={{ width: { md: drawerWidth }, shrink: { md: 0 } }}
+        sx={{ 
+          width: { md: drawerWidth }, 
+          flexShrink: { md: 0 },
+          display: { xs: 'none', md: 'block' } 
+        }}
         aria-label="mailbox folders"
       >
         {/* Desktop View Permanent Drawer */}
@@ -326,12 +330,14 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
           flexGrow: 1,
           p: { xs: 2, sm: 3, md: 4 },
           pb: { xs: '96px', sm: '96px', md: 4 },
-          width: { md: `calc(100% - ${drawerWidth}px)` },
+          width: { xs: '100%', md: `calc(100% - ${drawerWidth}px)` },
+          maxWidth: '100%',
           mt: '64px', // Space for AppBar
           backgroundColor: theme.palette.background.default,
           minHeight: 'calc(100vh - 64px)',
           display: 'flex',
-          flexDirection: 'column'
+          flexDirection: 'column',
+          overflowX: 'hidden'
         }}
       >
         {children}
