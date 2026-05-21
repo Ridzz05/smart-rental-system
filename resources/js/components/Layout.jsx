@@ -21,7 +21,6 @@ import AppRegistrationIcon from '@mui/icons-material/AppRegistration'; // Rental
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong'; // Rentals
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar'; // Fleet
 import PeopleIcon from '@mui/icons-material/People'; // Customers
-import MenuIcon from '@mui/icons-material/Menu';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave'; // Logo
@@ -31,18 +30,13 @@ const drawerWidth = 260;
 export default function Layout({ children, currentPage, setCurrentPage, mode, toggleColorMode }) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
 
   const menuItems = [
-    { text: 'Dashboard', id: 'dashboard', icon: <DashboardIcon /> },
-    { text: 'Rental Desk', id: 'rental-desk', icon: <AppRegistrationIcon /> },
-    { text: 'Rentals Logs', id: 'rentals', icon: <ReceiptLongIcon /> },
-    { text: 'Fleet Manager', id: 'fleet', icon: <DirectionsCarIcon /> },
-    { text: 'Customer Base', id: 'customers', icon: <PeopleIcon /> },
+    { text: 'Dashboard', short: 'Home', id: 'dashboard', icon: <DashboardIcon /> },
+    { text: 'Rental Desk', short: 'Desk', id: 'rental-desk', icon: <AppRegistrationIcon /> },
+    { text: 'Rentals Logs', short: 'Logs', id: 'rentals', icon: <ReceiptLongIcon /> },
+    { text: 'Fleet Manager', short: 'Fleet', id: 'fleet', icon: <DirectionsCarIcon /> },
+    { text: 'Customer Base', short: 'Customers', id: 'customers', icon: <PeopleIcon /> },
   ];
 
   const drawerContent = (
@@ -79,7 +73,6 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
               <ListItemButton
                 onClick={() => {
                   setCurrentPage(item.id);
-                  if (isMobile) setMobileOpen(false);
                 }}
                 sx={{
                   borderRadius: 2,
@@ -153,15 +146,6 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
       >
         <Toolbar sx={{ justifyContent: 'space-between', px: { xs: 2, sm: 3 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { md: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
             <Typography variant="h6" noWrap component="div" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '1.25rem' }}>
               {menuItems.find(item => item.id === currentPage)?.text || 'Smart Rental'}
             </Typography>
@@ -184,22 +168,6 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
         sx={{ width: { md: drawerWidth }, shrink: { md: 0 } }}
         aria-label="mailbox folders"
       >
-        {/* Mobile View Drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, borderRight: 'none', boxShadow: '4px 0 24px rgba(0,0,0,0.05)' },
-          }}
-        >
-          {drawerContent}
-        </Drawer>
-        
         {/* Desktop View Permanent Drawer */}
         <Drawer
           variant="permanent"
@@ -213,12 +181,93 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
         </Drawer>
       </Box>
 
+      {/* Rounded Bottom Navbar for Mobile View */}
+      <Box
+        sx={{
+          display: { xs: 'flex', md: 'none' },
+          position: 'fixed',
+          bottom: 16,
+          left: 16,
+          right: 16,
+          height: 64,
+          backgroundColor: theme.palette.mode === 'light' ? 'rgba(255, 255, 255, 0.85)' : 'rgba(24, 24, 27, 0.85)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderRadius: '24px',
+          boxShadow: theme.palette.mode === 'light'
+            ? '0 10px 30px -10px rgba(79, 70, 229, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05)'
+            : '0 10px 30px -10px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(255, 255, 255, 0.02)',
+          border: `1px solid ${theme.palette.divider}`,
+          zIndex: theme.zIndex.appBar,
+          justifyContent: 'space-around',
+          alignItems: 'center',
+          px: 1,
+        }}
+      >
+        {menuItems.map((item) => {
+          const active = currentPage === item.id;
+          return (
+            <Box
+              key={item.id}
+              onClick={() => setCurrentPage(item.id)}
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                flex: 1,
+                py: 0.5,
+                borderRadius: '16px',
+                color: active ? theme.palette.primary.main : theme.palette.text.secondary,
+                transition: 'all 0.2s ease',
+                position: 'relative',
+                '&:active': {
+                  transform: 'scale(0.95)',
+                }
+              }}
+            >
+              {active && (
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 4,
+                    bottom: 4,
+                    left: 6,
+                    right: 6,
+                    backgroundColor: theme.palette.mode === 'light' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(129, 140, 248, 0.1)',
+                    borderRadius: '12px',
+                    zIndex: -1,
+                  }}
+                />
+              )}
+              <Box sx={{ display: 'flex', alignItems: 'center', mb: 0.25 }}>
+                {item.icon}
+              </Box>
+              <Typography
+                variant="caption"
+                sx={{
+                  fontSize: '0.65rem',
+                  fontWeight: active ? 700 : 500,
+                  letterSpacing: 0.2,
+                  textAlign: 'center',
+                  lineHeight: 1
+                }}
+              >
+                {item.short}
+              </Typography>
+            </Box>
+          );
+        })}
+      </Box>
+
       {/* Main Main Content Container */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: { xs: 2, sm: 3, md: 4 },
+          pb: { xs: '96px', sm: '96px', md: 4 },
           width: { md: `calc(100% - ${drawerWidth}px)` },
           mt: '64px', // Space for AppBar
           backgroundColor: theme.palette.background.default,

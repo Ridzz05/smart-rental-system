@@ -96,10 +96,10 @@ export default function Dashboard({ setCurrentPage }) {
   return (
     <Box sx={{ flexGrow: 1 }}>
       {/* Welcome Banner */}
-      <Box sx={{ 
-        p: { xs: 3, md: 4 }, 
-        mb: 4, 
-        borderRadius: 4, 
+      <Box sx={{
+        p: { xs: 3, md: 4 },
+        mb: 4,
+        borderRadius: 4,
         background: (theme) => theme.palette.mode === 'light'
           ? 'linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%)'
           : 'linear-gradient(135deg, #18181b 0%, #27272a 100%)',
@@ -118,8 +118,8 @@ export default function Dashboard({ setCurrentPage }) {
             Here is the status of your vehicle rental operations today.
           </Typography>
         </Box>
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           onClick={() => setCurrentPage('rental-desk')}
           startIcon={<LaunchIcon />}
           sx={{ py: 1.2, px: 3, borderRadius: 2 }}
@@ -162,7 +162,7 @@ export default function Dashboard({ setCurrentPage }) {
             <Typography variant="h6" sx={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, mb: 3 }}>
               Monthly Revenue Performance
             </Typography>
-            
+
             {/* Custom SVG Bar Chart */}
             <Box sx={{ position: 'relative', height: 260, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'end' }}>
               <Box sx={{ display: 'flex', height: 220, alignItems: 'end', justifyContent: 'space-around', px: 2 }}>
@@ -175,9 +175,9 @@ export default function Dashboard({ setCurrentPage }) {
                         {item.revenue >= 1000000 ? (item.revenue / 1000000).toFixed(1) + 'M' : (item.revenue / 1000).toFixed(0) + 'K'}
                       </Typography>
                       {/* Chart Bar */}
-                      <Box sx={{ 
-                        height: `${percentageHeight}%`, 
-                        width: '100%', 
+                      <Box sx={{
+                        height: `${percentageHeight}%`,
+                        width: '100%',
                         background: 'linear-gradient(to top, #6366f1, #818cf8)',
                         borderRadius: '6px 6px 0 0',
                         transition: 'height 0.8s ease',
@@ -194,7 +194,6 @@ export default function Dashboard({ setCurrentPage }) {
                   );
                 })}
               </Box>
-              <Divider sx={{ mt: 1 }} />
             </Box>
           </Card>
         </Grid>
@@ -228,7 +227,7 @@ export default function Dashboard({ setCurrentPage }) {
                   const today = new Date();
                   const diffTime = end - today;
                   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                  
+
                   let chipLabel = `${diffDays} days left`;
                   let chipColor = 'primary';
                   if (diffDays <= 0) {
@@ -240,9 +239,9 @@ export default function Dashboard({ setCurrentPage }) {
                   }
 
                   return (
-                    <Paper 
-                      key={rental.id} 
-                      variant="outlined" 
+                    <Paper
+                      key={rental.id}
+                      variant="outlined"
                       sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderRadius: 2 }}
                     >
                       <Box>
@@ -262,11 +261,11 @@ export default function Dashboard({ setCurrentPage }) {
                 })
               )}
             </Box>
-            
+
             {stats.upcoming_returns.length > 0 && (
-              <Button 
-                variant="outlined" 
-                fullWidth 
+              <Button
+                variant="outlined"
+                fullWidth
                 onClick={() => setCurrentPage('rentals')}
                 sx={{ mt: 3, borderRadius: 2 }}
               >
