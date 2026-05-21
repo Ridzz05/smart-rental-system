@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
@@ -25,6 +26,7 @@ import { useLanguage } from "../i18n/i18n";
 
 export default function Rentals() {
     const { t } = useLanguage();
+    const isMobile = useMediaQuery("(max-width:600px)");
     const [rentals, setRentals] = useState([]);
     const [statusFilter, setStatusFilter] = useState("All");
     const [loading, setLoading] = useState(true);
@@ -84,7 +86,10 @@ export default function Rentals() {
                 showToast(t("rentals.toast_return_success"));
                 fetchRentals();
             } else {
-                showToast(data.message || t("rentals.toast_return_failed"), "error");
+                showToast(
+                    data.message || t("rentals.toast_return_failed"),
+                    "error",
+                );
             }
         } catch (err) {
             console.error(err);
@@ -131,6 +136,20 @@ export default function Rentals() {
                 return t("rentals.cancelled");
             default:
                 return status;
+        }
+    };
+
+    const formatDisplayDate = (dateString) => {
+        if (!dateString) return "-";
+        try {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return dateString;
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        } catch (e) {
+            return dateString;
         }
     };
 
@@ -188,13 +207,19 @@ export default function Rentals() {
                         minWidth: { xs: "100%", sm: 180 },
                         bgcolor: "background.paper",
                         borderRadius: 2,
-                        alignSelf: { xs: "stretch", sm: "auto" }
+                        alignSelf: { xs: "stretch", sm: "auto" },
                     }}
                 >
                     <MenuItem value="All">{t("rentals.all_statuses")}</MenuItem>
-                    <MenuItem value="Ongoing">{t("rentals.ongoing_rented")}</MenuItem>
-                    <MenuItem value="Completed">{t("rentals.completed")}</MenuItem>
-                    <MenuItem value="Cancelled">{t("rentals.cancelled")}</MenuItem>
+                    <MenuItem value="Ongoing">
+                        {t("rentals.ongoing_rented")}
+                    </MenuItem>
+                    <MenuItem value="Completed">
+                        {t("rentals.completed")}
+                    </MenuItem>
+                    <MenuItem value="Cancelled">
+                        {t("rentals.cancelled")}
+                    </MenuItem>
                 </TextField>
             </Box>
 
@@ -340,7 +365,9 @@ export default function Rentals() {
                                                         variant="body2"
                                                         sx={{ fontWeight: 500 }}
                                                     >
-                                                        {rental.start_date}
+                                                        {formatDisplayDate(
+                                                            rental.start_date,
+                                                        )}
                                                     </Typography>
                                                     <Typography
                                                         variant="caption"
@@ -360,7 +387,9 @@ export default function Rentals() {
                                                         variant="body2"
                                                         sx={{ fontWeight: 500 }}
                                                     >
-                                                        {rental.end_date}
+                                                        {formatDisplayDate(
+                                                            rental.end_date,
+                                                        )}
                                                     </Typography>
                                                     <Typography
                                                         variant="caption"
@@ -387,12 +416,15 @@ export default function Rentals() {
                                                 variant="caption"
                                                 color="text.secondary"
                                             >
-                                                {rental.total_days} {t("rental_desk.days")}
+                                                {rental.total_days}{" "}
+                                                {t("rental_desk.days")}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={getStatusLabel(rental.status)}
+                                                label={getStatusLabel(
+                                                    rental.status,
+                                                )}
                                                 color={getStatusChipColor(
                                                     rental.status,
                                                 )}
@@ -428,8 +460,12 @@ export default function Rentals() {
                                                     }}
                                                 >
                                                     {processingId === rental.id
-                                                        ? t("rentals.processing")
-                                                        : t("rentals.process_return")}
+                                                        ? t(
+                                                              "rentals.processing",
+                                                          )
+                                                        : t(
+                                                              "rentals.process_return",
+                                                          )}
                                                 </Button>
                                             ) : (
                                                 <Typography
@@ -443,7 +479,7 @@ export default function Rentals() {
                                         </TableCell>
                                     </TableRow>
                                 ))
-                             )}
+                            )}
                         </TableBody>
                     </Table>
                 </TableContainer>
@@ -454,7 +490,11 @@ export default function Rentals() {
                 open={toast.open}
                 autoHideDuration={4000}
                 onClose={handleCloseToast}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                anchorOrigin={
+                    isMobile
+                        ? { vertical: "top", horizontal: "right" }
+                        : { vertical: "bottom", horizontal: "right" }
+                }
             >
                 <Alert
                     onClose={handleCloseToast}
