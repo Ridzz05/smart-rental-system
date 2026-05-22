@@ -17,11 +17,14 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Create Default User (for potential future login or admin user)
-        User::factory()->create([
-            'name' => 'Admin Rental',
-            'email' => 'admin@rental.com',
-            'password' => bcrypt('password'),
-        ]);
+        User::query()->firstOrCreate(
+            ['email' => 'admin@rental.com'],
+            [
+                'name' => 'Admin Rental',
+                'password' => bcrypt('password'),
+                'role' => 'admin',
+            ],
+        );
 
         // 2. Create Categories
         $categories = [
