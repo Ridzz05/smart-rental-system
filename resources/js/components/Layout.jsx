@@ -12,9 +12,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
 import { useLanguage } from '../i18n/i18n';
+import { useAuth } from '../auth/AuthContext';
+import SettingsModal from '../auth/SettingsModal';
 
 // Icons
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -25,6 +29,8 @@ import PeopleIcon from '@mui/icons-material/People'; // Customers
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave'; // Logo
+import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 const drawerWidth = 260;
 
@@ -34,6 +40,24 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
   const isDark = mode === 'dark';
 
   const { t, language, toggleLanguage } = useLanguage();
+  const { user, logout } = useAuth();
+
+  // Profile dropdown
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const profileOpen = Boolean(anchorEl);
+  const handleAvatarClick = (e) => setAnchorEl(e.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  const handleLogout = async () => {
+    handleMenuClose();
+    await logout();
+  };
+
+  const handleSettings = () => {
+    handleMenuClose();
+    setSettingsOpen(true);
+  };
 
   const menuItems = [
     { text: t('menu.dashboard'), short: language === 'eng' ? 'Home' : 'Dasbor', id: 'dashboard', icon: <DashboardIcon /> },
@@ -112,20 +136,24 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
       </List>
       <Divider />
 
-      {/* Sidebar Footer / User Info */}
-      <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Avatar 
-          alt="Staff Admin" 
-          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" 
-          sx={{ width: 40, height: 40, border: `2px solid ${theme.palette.primary.main}` }}
-        />
-        <Box sx={{ overflow: 'hidden' }}>
-          <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
-            Alice Johnson
-          </Typography>
-          <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
-            Rental Officer
-          </Typography>
+      {/* Sidebar Footer spacer */}
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <Avatar
+            src={user?.profile_picture || undefined}
+            alt={user?.name || 'U'}
+            sx={{ width: 36, height: 36, fontSize: 14, fontWeight: 700, border: `2px solid ${theme.palette.primary.main}` }}
+          >
+            {!user?.profile_picture && (user?.name?.[0]?.toUpperCase() || 'U')}
+          </Avatar>
+          <Box sx={{ overflow: 'hidden' }}>
+            <Typography variant="subtitle2" noWrap sx={{ fontWeight: 600 }}>
+              {user?.name || 'User'}
+            </Typography>
+            <Typography variant="caption" color="text.secondary" noWrap sx={{ display: 'block' }}>
+              {user?.role || 'staff'}
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Box>
@@ -213,9 +241,78 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
               {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
             <Divider orientation="vertical" variant="middle" flexItem />
-            <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'block' } }}>
-              Alice Johnson
-            </Typography>
+
+            {/* Profile Avatar + Dropdown */}
+            <IconButton onClick={handleAvatarClick} sx={{ p: 0.5 }}>
+              <Avatar
+                alt={user?.name || 'U'}
+                src={user?.profile_picture || undefined}
+                sx={{ width: 34, height: 34, fontSize: 14, fontWeight: 700, border: `2px solid ${theme.palette.primary.main}`, cursor: 'pointer' }}
+              >
+                {!user?.profile_picture && (user?.name?.[0]?.toUpperCase() || 'U')}
+              </Avatar>
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={profileOpen}
+              onClose={handleMenuClose}
+              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 200,
+                  borderRadius: 2,
+                  boxShadow: isDark
+                    ? '0 8px 32px rgba(0,0,0,0.7)'
+                    : '0 8px 32px rgba(0,0,0,0.12)',
+                  border: `1px solid ${theme.palette.divider}`,
+                  overflow: 'visible',
+                  '&::before': {
+                    content: '""',
+                    display: 'block',
+                    position: 'absolute',
+                    top: -6,
+                    right: 14,
+                    width: 12,
+                    height: 12,
+                    backgroundColor: 'background.paper',
+                    transform: 'rotate(45deg)',
+                    borderTop: `1px solid ${theme.palette.divider}`,
+                    borderLeft: `1px solid ${theme.palette.divider}`,
+                  },
+                },
+              }}
+            >
+              {/* User Info Header */}
+              <Box sx={{ px: 2, py: 1.5, borderBottom: `1px solid ${theme.palette.divider}` }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{user?.name || 'User'}</Typography>
+                <Typography variant="caption" color="text.secondary">{user?.role || 'staff'}</Typography>
+              </Box>
+
+              <MenuItem onClick={handleSettings} sx={{ py: 1.2, px: 2, gap: 1.5, mt: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 'unset', color: 'text.secondary' }}>
+                  <SettingsIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>Settings</Typography>
+              </MenuItem>
+
+              <Divider sx={{ my: 0.5 }} />
+
+              <MenuItem
+                onClick={handleLogout}
+                sx={{
+                  py: 1.2, px: 2, gap: 1.5, mb: 0.5,
+                  color: 'error.main',
+                  '&:hover': { backgroundColor: 'rgba(239,68,68,0.08)' },
+                }}
+              >
+                <ListItemIcon sx={{ minWidth: 'unset', color: 'error.main' }}>
+                  <LogoutIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>Logout</Typography>
+              </MenuItem>
+            </Menu>
           </Box>
         </Toolbar>
       </AppBar>
@@ -323,7 +420,8 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
         })}
       </Box>
 
-      {/* Main Main Content Container */}
+      {/* Settings Modal */}
+      <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
       <Box
         component="main"
         sx={{

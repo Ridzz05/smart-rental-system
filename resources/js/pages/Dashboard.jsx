@@ -13,6 +13,7 @@ import Paper from '@mui/material/Paper';
 // i18n
 import { useLanguage } from '../i18n/i18n';
 import { useTheme } from '@mui/material/styles';
+import { useAuth } from '../auth/AuthContext';
 
 // Icons
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
@@ -23,9 +24,10 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import NotificationsActiveIcon from '@mui/icons-material/NotificationsActive';
 
 export default function Dashboard({ setCurrentPage }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const { user } = useAuth();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -111,7 +113,10 @@ export default function Dashboard({ setCurrentPage }) {
       }}>
         <Box>
           <Typography variant="h4" sx={{ fontFamily: '"Google Sans", sans-serif', fontWeight: 800, mb: 0.5, letterSpacing: '-0.02em' }}>
-            {t('dashboard.welcome_alice')}
+            {language === 'id'
+              ? `Selamat datang kembali, ${user?.name?.split(' ')[0] ?? ''}!`
+              : `Welcome back, ${user?.name?.split(' ')[0] ?? ''}!`
+            }
           </Typography>
           <Typography variant="body1" color="text.secondary">
             {t('dashboard.subtitle')}

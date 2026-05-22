@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RentalDesk from './pages/RentalDesk';
@@ -9,6 +11,9 @@ import Fleet from './pages/Fleet';
 import Customers from './pages/Customers';
 import Rentals from './pages/Rentals';
 import { LanguageProvider } from './i18n/i18n';
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import LoginPage from './auth/LoginPage';
+import RegisterPage from './auth/RegisterPage';
 
 function App() {
   const [mode, setMode] = useState(() => {
@@ -295,6 +300,9 @@ function App() {
     },
   }), [mode]);
 
+  // ─── Auth Gate ────────────────────────────────────────────────────────────
+  const [authPage, setAuthPage] = useState('login'); // 'login' | 'register'
+
   // Render Page Component dynamically (keeps sidebar state and enables persistent-like cashier flow)
   const renderPage = () => {
     switch (currentPage) {
@@ -317,16 +325,50 @@ function App() {
     <LanguageProvider>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Layout 
-          currentPage={currentPage} 
-          setCurrentPage={setCurrentPage} 
-          mode={mode} 
-          toggleColorMode={toggleColorMode}
-        >
-          {renderPage()}
-        </Layout>
+        <AuthProvider>
+          <AuthGate
+            authPage={authPage}
+            setAuthPage={setAuthPage}
+            renderPage={renderPage}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            mode={mode}
+            toggleColorMode={toggleColorMode}
+          />
+        </AuthProvider>
       </ThemeProvider>
     </LanguageProvider>
+  );
+}
+
+// Auth gate component — consumes AuthContext inside AuthProvider
+function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPage, mode, toggleColorMode }) {
+  const { user, authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <CircularProgress size={48} thickness={3} />
+      </Box>
+    );
+  }
+
+  if (!user) {
+    if (authPage === 'register') {
+      return <RegisterPage onGoLogin={() => setAuthPage('login')} />;
+    }
+    return <LoginPage onGoRegister={() => setAuthPage('register')} />;
+  }
+
+  return (
+    <Layout
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      mode={mode}
+      toggleColorMode={toggleColorMode}
+    >
+      {renderPage()}
+    </Layout>
   );
 }
 

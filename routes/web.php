@@ -6,6 +6,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\RentalController;
 use App\Http\Controllers\DashboardController;
 use App\Models\Category;
+use App\Http\Controllers\AuthController;
+use Illuminate\Http\Request;
 
 // 1. Web API Routes
 Route::prefix('api')->group(function () {
@@ -28,6 +30,13 @@ Route::prefix('api')->group(function () {
     Route::get('rentals', [RentalController::class, 'index']);
     Route::post('rentals/book', [RentalController::class, 'book']);
     Route::post('rentals/{id}/return', [RentalController::class, 'returnVehicle']);
+
+    // Authentication
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+    Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('me', [AuthController::class, 'me']);
+    Route::put('me', [AuthController::class, 'updateProfile']);
 });
 
 // 2. SPA Fallback Route
