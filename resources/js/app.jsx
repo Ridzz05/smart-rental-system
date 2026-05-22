@@ -1,9 +1,13 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import useMediaQuery from '@mui/material/useMediaQuery';
+import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import VolumeOffIcon from '@mui/icons-material/VolumeOff';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
 import RentalDesk from './pages/RentalDesk';
@@ -344,6 +348,16 @@ function App() {
 // Auth gate component — consumes AuthContext inside AuthProvider
 function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPage, mode, toggleColorMode }) {
   const { user, authLoading } = useAuth();
+  const isMobile = useMediaQuery('(max-width:600px)');
+  const videoRef = useRef(null);
+  const [muted, setMuted] = useState(true);
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setMuted(v => !v);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -354,10 +368,71 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
   }
 
   if (!user) {
-    if (authPage === 'register') {
-      return <RegisterPage onGoLogin={() => setAuthPage('login')} />;
-    }
-    return <LoginPage onGoRegister={() => setAuthPage('register')} />;
+    return (
+      <Box sx={{ position: 'relative', minHeight: '100vh' }}>
+        {/* Shared video — stays mounted across login ↔ register */}
+        {isMobile && (
+          <>
+            <Box
+              component="video"
+              ref={videoRef}
+              src="/assets/mp4/bmw-m3.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              sx={{
+                position: 'fixed',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: 'auto',
+                height: 'auto',
+                minWidth: '100%',
+                minHeight: '100%',
+                maxWidth: 'none',
+                objectFit: 'contain',
+                zIndex: 0,
+                pointerEvents: 'none',
+                backgroundColor: '#000',
+              }}
+            />
+            <Box
+              sx={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(0,0,0,0.48)',
+                zIndex: 1,
+                pointerEvents: 'none',
+              }}
+            />
+            <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 10 }}>
+              <IconButton
+                onClick={toggleMute}
+                size="medium"
+                sx={{
+                  background: 'rgba(0,0,0,0.45)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  backdropFilter: 'blur(8px)',
+                  color: '#fff',
+                  width: 44, height: 44,
+                  '&:hover': { background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.4)' },
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
+              </IconButton>
+            </Box>
+          </>
+        )}
+
+        {/* Auth pages — no video, no mute button inside them */}
+        {authPage === 'register'
+          ? <RegisterPage onGoLogin={() => setAuthPage('login')} />
+          : <LoginPage onGoRegister={() => setAuthPage('register')} />
+        }
+      </Box>
+    );
   }
 
   return (
