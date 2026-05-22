@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -44,6 +44,12 @@ export default function RentalDesk() {
   
   // Notification State
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }), []);
 
   useEffect(() => {
     fetchData();
@@ -92,7 +98,7 @@ export default function RentalDesk() {
     return { days, total };
   };
 
-  const { days, total } = calculation();
+  const { days, total } = useMemo(calculation, [selectedVehicle, startDate, endDate]);
 
   const handleSelectVehicle = (vehicle) => {
     if (vehicle.status !== 'Available') {
@@ -180,23 +186,17 @@ export default function RentalDesk() {
     }
   };
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+  const formatCurrency = (val) => currencyFormatter.format(val);
 
   // Filter logic
-  const filteredVehicles = vehicles.filter(v => {
+  const filteredVehicles = useMemo(() => vehicles.filter(v => {
     const matchesCategory = selectedCategory === 'All' || v.category?.name === selectedCategory;
-    const matchesSearch = v.brand.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           v.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           v.license_plate.toLowerCase().includes(searchQuery.toLowerCase());
+    const query = searchQuery.toLowerCase();
+    const matchesSearch = v.brand.toLowerCase().includes(query) || 
+                           v.model.toLowerCase().includes(query) ||
+                           v.license_plate.toLowerCase().includes(query);
     return matchesCategory && matchesSearch;
-  });
+  }), [vehicles, selectedCategory, searchQuery]);
 
   if (loading) {
     return (
@@ -210,7 +210,7 @@ export default function RentalDesk() {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={3} sx={{ height: '100%' }}>
         {/* Vehicles Showcase Grid (Left Hand Side) */}
-        <Grid item xs={12} lg={selectedVehicle ? 8 : 12} sx={{ transition: 'all 0.3s ease' }}>
+        <Grid item xs={12} lg={selectedVehicle ? 8 : 12} sx={{ transition: { xs: 'none', lg: 'width 0.2s ease' } }}>
           <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
             {/* Search */}
             <TextField
@@ -242,8 +242,10 @@ export default function RentalDesk() {
                     px: 1,
                     borderRadius: 2,
                     cursor: 'pointer',
-                    '&:hover': { transform: 'translateY(-1px)' },
-                    transition: 'all 0.15s ease'
+                    '@media (hover: hover)': {
+                      '&:hover': { transform: 'translateY(-1px)' },
+                    },
+                    transition: 'background-color 0.15s ease, color 0.15s ease'
                   }}
                 />
               ))}
@@ -268,18 +270,26 @@ export default function RentalDesk() {
                       boxShadow: isSelected 
                         ? (isDark ? '0 2px 8px rgba(255, 255, 255, 0.1)' : '0 2px 8px rgba(0, 0, 0, 0.05)')
                         : undefined,
+                      '@media (hover: hover)': {
+                        '&:hover': isAvailable ? {
+                          transform: 'translateY(-2px)',
+                          boxShadow: (theme) => theme.shadows[2],
+                          borderColor: isSelected ? 'text.primary' : undefined
+                        } : {},
+                      },
                       '&:hover': isAvailable ? {
-                        transform: 'translateY(-2px)',
                         boxShadow: (theme) => theme.shadows[2],
                         borderColor: isSelected ? 'text.primary' : undefined
                       } : {},
-                      transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)'
+                      transition: { xs: 'none', sm: 'box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease' }
                     }}
                   >
                     <Box sx={{ position: 'relative', height: 160, overflow: 'hidden', bgcolor: 'grey.100' }}>
                       <img 
                         src={vehicle.image_url || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=400"}
                         alt={vehicle.brand}
+                        loading="lazy"
+                        decoding="async"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
                       <Chip

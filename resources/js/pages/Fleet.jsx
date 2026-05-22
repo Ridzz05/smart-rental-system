@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -46,11 +46,37 @@ export default function Fleet() {
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState({ open: false, message: '', severity: 'success' });
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, id: null });
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }), []);
 
   useEffect(() => {
-    fetchVehicles();
-    fetchCategories();
+    fetchData();
   }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [vehiclesRes, categoriesRes] = await Promise.all([
+        fetch('/api/vehicles'),
+        fetch('/api/categories'),
+      ]);
+      const [vehiclesData, categoriesData] = await Promise.all([
+        vehiclesRes.json(),
+        categoriesRes.json(),
+      ]);
+      setVehicles(vehiclesData);
+      setCategories(categoriesData);
+    } catch (err) {
+      console.error(err);
+      showToast(t('fleet.toast_load_failed'), 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchVehicles = () => {
     setLoading(true);
@@ -97,7 +123,9 @@ export default function Fleet() {
       
       if (response.ok) {
         showToast(`${t('fleet.toast_update_status')} ${nextStatus}`);
-        fetchVehicles();
+        setVehicles((items) => items.map((item) => (
+          item.id === vehicle.id ? { ...item, status: nextStatus } : item
+        )));
       } else {
         const data = await response.json();
         showToast(data.message || t('customers.toast_validation_error'), 'error');
@@ -126,7 +154,7 @@ export default function Fleet() {
       
       if (response.ok) {
         showToast(t('fleet.toast_delete_success'));
-        fetchVehicles();
+        setVehicles((items) => items.filter((item) => item.id !== id));
       } else {
         const data = await response.json();
         showToast(data.message || t('customers.toast_connection_error'), 'error');
@@ -176,14 +204,7 @@ export default function Fleet() {
     }
   };
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+  const formatCurrency = (val) => currencyFormatter.format(val);
 
   if (loading) {
     return (
@@ -227,10 +248,12 @@ export default function Fleet() {
                 height: '100%', 
                 display: 'flex', 
                 flexDirection: 'column',
-                transition: 'all 0.2s ease',
-                '&:hover': {
-                  transform: 'translateY(-2px)',
-                  boxShadow: (theme) => theme.shadows[2],
+                transition: { xs: 'none', sm: 'box-shadow 0.2s ease, transform 0.2s ease' },
+                '@media (hover: hover)': {
+                  '&:hover': {
+                    transform: 'translateY(-2px)',
+                    boxShadow: (theme) => theme.shadows[2],
+                  },
                 }
               }}>
                 {/* Vehicle Thumbnail */}
@@ -238,6 +261,8 @@ export default function Fleet() {
                   <img 
                     src={vehicle.image_url || "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&q=80&w=400"}
                     alt={vehicle.brand}
+                    loading="lazy"
+                    decoding="async"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                   <Chip

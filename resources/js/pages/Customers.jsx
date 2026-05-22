@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
@@ -24,6 +24,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 // i18n
@@ -31,6 +32,7 @@ import { useLanguage } from '../i18n/i18n';
 
 export default function Customers() {
   const { t } = useLanguage();
+  const isMobile = useMediaQuery('(max-width:600px)');
   const [customers, setCustomers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
@@ -166,13 +168,13 @@ export default function Customers() {
     }
   };
 
-  const filteredCustomers = customers.filter(c => {
+  const filteredCustomers = useMemo(() => customers.filter(c => {
     const query = searchQuery.toLowerCase();
     return c.name.toLowerCase().includes(query) || 
            (c.email && c.email.toLowerCase().includes(query)) ||
            c.phone.includes(query) ||
-           (c.driver_license && c.driver_license.includes(query));
-  });
+           (c.identity_number && c.identity_number.includes(query));
+  }), [customers, searchQuery]);
 
   if (loading) {
     return (
@@ -220,12 +222,70 @@ export default function Customers() {
                 </InputAdornment>
               ),
             }}
-            sx={{ minWidth: 350, bgcolor: 'background.paper', borderRadius: 2 }}
+            sx={{ width: { xs: '100%', sm: 350 }, bgcolor: 'background.paper', borderRadius: 2 }}
           />
         </Box>
         <Divider />
 
         {/* Table List */}
+        {isMobile ? (
+          <Box sx={{ p: 2, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+            {filteredCustomers.length === 0 ? (
+              <Box sx={{ py: 5, textAlign: 'center' }}>
+                <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  {t('customers.no_customers')}
+                </Typography>
+              </Box>
+            ) : (
+              filteredCustomers.map((customer) => (
+                <Paper key={customer.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1.5, alignItems: 'flex-start' }}>
+                    <Box sx={{ minWidth: 0 }}>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 700 }} noWrap>
+                        {customer.name}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        #CUST-{String(customer.id).padStart(4, '0')}
+                      </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: 0.75, flexShrink: 0 }}>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleOpenEdit(customer)}
+                        sx={{ minWidth: 36, p: 0.5, borderRadius: 1.5 }}
+                      >
+                        <EditIcon sx={{ fontSize: 18 }} />
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="small"
+                        onClick={() => handleDeleteClick(customer.id)}
+                        sx={{ minWidth: 36, p: 0.5, borderRadius: 1.5 }}
+                      >
+                        <DeleteOutlineIcon fontSize="small" />
+                      </Button>
+                    </Box>
+                  </Box>
+                  <Divider sx={{ my: 1.25 }} />
+                  <Typography variant="body2" sx={{ fontWeight: 600 }}>{customer.phone}</Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>
+                    {customer.email || t('customers.no_email')}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    {customer.identity_number || t('customers.not_recorded')}
+                  </Typography>
+                  {customer.address && (
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                      {customer.address}
+                    </Typography>
+                  )}
+                </Paper>
+              ))
+            )}
+          </Box>
+        ) : (
         <TableContainer component={Paper} sx={{ border: 'none', boxShadow: 'none' }}>
           <Table sx={{ minWidth: 650 }}>
             <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8fafc' : '#1e1e24' }}>
@@ -303,6 +363,7 @@ export default function Customers() {
             </TableBody>
           </Table>
         </TableContainer>
+        )}
       </Card>
 
       {/* Add/Edit Dialog */}

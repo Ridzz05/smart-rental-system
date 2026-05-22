@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
@@ -99,19 +99,19 @@ export default function Rentals() {
         }
     };
 
-    const formatCurrency = (val) => {
-        return new Intl.NumberFormat("id-ID", {
+    const currencyFormatter = useMemo(() => new Intl.NumberFormat("id-ID", {
             style: "currency",
             currency: "IDR",
             minimumFractionDigits: 0,
             maximumFractionDigits: 0,
-        }).format(val);
-    };
+        }), []);
 
-    const filteredRentals = rentals.filter((r) => {
+    const formatCurrency = (val) => currencyFormatter.format(val);
+
+    const filteredRentals = useMemo(() => rentals.filter((r) => {
         if (statusFilter === "All") return true;
         return r.status === statusFilter;
-    });
+    }), [rentals, statusFilter]);
 
     const getStatusChipColor = (status) => {
         switch (status) {
@@ -225,6 +225,80 @@ export default function Rentals() {
 
             {/* Table Log Ledger */}
             <Card>
+                {isMobile ? (
+                    <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1.5 }}>
+                        {filteredRentals.length === 0 ? (
+                            <Box sx={{ py: 5, textAlign: "center" }}>
+                                <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    {t("rentals.no_records")}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {t("rentals.no_records_desc")}
+                                </Typography>
+                            </Box>
+                        ) : (
+                            filteredRentals.map((rental) => (
+                                <Paper key={rental.id} variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                                    <Box sx={{ display: "flex", justifyContent: "space-between", gap: 1.5, alignItems: "flex-start" }}>
+                                        <Box sx={{ minWidth: 0 }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800 }}>
+                                                #RN-{String(rental.id).padStart(4, "0")}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {rental.payment_method}
+                                            </Typography>
+                                        </Box>
+                                        <Chip
+                                            label={getStatusLabel(rental.status)}
+                                            color={getStatusChipColor(rental.status)}
+                                            size="small"
+                                            sx={{ fontWeight: 700, borderRadius: 1, flexShrink: 0 }}
+                                        />
+                                    </Box>
+                                    <Divider sx={{ my: 1.25 }} />
+                                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                                        {rental.vehicle.brand} {rental.vehicle.model}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                                        {t("dashboard.license_plate")}: {rental.vehicle.license_plate}
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ mt: 1, fontWeight: 600 }}>
+                                        {rental.customer.name}
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" sx={{ display: "block" }}>
+                                        {formatDisplayDate(rental.start_date)} - {formatDisplayDate(rental.end_date)}
+                                    </Typography>
+                                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mt: 1.5, gap: 1 }}>
+                                        <Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: "primary.main" }}>
+                                                {formatCurrency(rental.total_amount)}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">
+                                                {rental.total_days} {t("rental_desk.days")}
+                                            </Typography>
+                                        </Box>
+                                        {rental.status === "Ongoing" ? (
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                size="small"
+                                                disabled={processingId === rental.id}
+                                                onClick={() => handleProcessReturn(rental.id)}
+                                                sx={{ borderRadius: 1.5, fontWeight: 700 }}
+                                            >
+                                                {processingId === rental.id ? t("rentals.processing") : t("rentals.process_return")}
+                                            </Button>
+                                        ) : (
+                                            <Typography variant="caption" color="text.secondary" sx={{ fontStyle: "italic" }}>
+                                                {t("rentals.returned")}
+                                            </Typography>
+                                        )}
+                                    </Box>
+                                </Paper>
+                            ))
+                        )}
+                    </Box>
+                ) : (
                 <TableContainer
                     component={Paper}
                     sx={{ border: "none", boxShadow: "none" }}
@@ -483,6 +557,7 @@ export default function Rentals() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                )}
             </Card>
 
             {/* Toast Notification */}

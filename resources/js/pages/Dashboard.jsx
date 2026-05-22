@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -31,6 +31,13 @@ export default function Dashboard({ setCurrentPage }) {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const currencyFormatter = useMemo(() => new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }), []);
+
   useEffect(() => {
     fetchStats();
   }, []);
@@ -49,14 +56,40 @@ export default function Dashboard({ setCurrentPage }) {
       });
   };
 
-  const formatCurrency = (val) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(val);
-  };
+  const formatCurrency = (val) => currencyFormatter.format(val);
+
+  // Cards Data Configuration
+  const cards = useMemo(() => [
+    {
+      title: t('dashboard.total_revenue'),
+      value: formatCurrency(stats?.total_revenue || 0),
+      icon: <AttachMoneyIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.revenue_desc')
+    },
+    {
+      title: t('dashboard.vehicles_on_road'),
+      value: stats?.vehicles_on_road || 0,
+      icon: <DepartureBoardIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.vehicles_on_road_desc')
+    },
+    {
+      title: t('dashboard.available_fleet'),
+      value: stats?.vehicles_available || 0,
+      icon: <DoneAllIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.available_fleet_desc')
+    },
+    {
+      title: t('dashboard.total_customers'),
+      value: stats?.total_customers || 0,
+      icon: <PeopleIcon sx={{ fontSize: 24 }} />,
+      desc: t('dashboard.total_customers_desc')
+    }
+  ], [stats, t, currencyFormatter]);
+
+  // Calculate Max Value for SVG Chart height mapping
+  const monthlyRevenue = stats?.monthly_revenue || [];
+  const revenues = monthlyRevenue.map(r => r.revenue);
+  const maxRevenue = Math.max(...revenues, 1000000);
 
   if (loading || !stats) {
     return (
@@ -65,38 +98,6 @@ export default function Dashboard({ setCurrentPage }) {
       </Box>
     );
   }
-
-  // Cards Data Configuration
-  const cards = [
-    {
-      title: t('dashboard.total_revenue'),
-      value: formatCurrency(stats.total_revenue),
-      icon: <AttachMoneyIcon sx={{ fontSize: 24 }} />,
-      desc: t('dashboard.revenue_desc')
-    },
-    {
-      title: t('dashboard.vehicles_on_road'),
-      value: stats.vehicles_on_road,
-      icon: <DepartureBoardIcon sx={{ fontSize: 24 }} />,
-      desc: t('dashboard.vehicles_on_road_desc')
-    },
-    {
-      title: t('dashboard.available_fleet'),
-      value: stats.vehicles_available,
-      icon: <DoneAllIcon sx={{ fontSize: 24 }} />,
-      desc: t('dashboard.available_fleet_desc')
-    },
-    {
-      title: t('dashboard.total_customers'),
-      value: stats.total_customers,
-      icon: <PeopleIcon sx={{ fontSize: 24 }} />,
-      desc: t('dashboard.total_customers_desc')
-    }
-  ];
-
-  // Calculate Max Value for SVG Chart height mapping
-  const revenues = stats.monthly_revenue.map(r => r.revenue);
-  const maxRevenue = Math.max(...revenues, 1000000);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -141,8 +142,10 @@ export default function Dashboard({ setCurrentPage }) {
                 height: '100%',
                 cursor: 'default',
                 '&:hover': {
-                  transform: 'translateY(-2px)',
                   boxShadow: (theme) => theme.shadows[2],
+                },
+                '@media (hover: hover)': {
+                  '&:hover': { transform: 'translateY(-2px)' },
                 },
               }}
             >
@@ -187,7 +190,7 @@ export default function Dashboard({ setCurrentPage }) {
             {/* Custom SVG Bar Chart */}
             <Box sx={{ position: 'relative', height: 260, width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'end' }}>
               <Box sx={{ display: 'flex', height: 220, alignItems: 'end', justifyContent: 'space-around', px: 2 }}>
-                {stats.monthly_revenue.map((item, idx) => {
+                {monthlyRevenue.map((item, idx) => {
                   const percentageHeight = (item.revenue / maxRevenue) * 90 + 10; // Map between 10% and 100%
                   return (
                     <Box key={idx} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '12%', height: '100%', justifyContent: 'end' }}>
@@ -203,7 +206,7 @@ export default function Dashboard({ setCurrentPage }) {
                           ? 'linear-gradient(to top, #525252, #A3A3A3)'
                           : 'linear-gradient(to top, #0A0A0A, #525252)',
                         borderRadius: '6px 6px 0 0',
-                        transition: 'height 0.8s ease',
+                        transition: { xs: 'none', sm: 'height 0.8s ease' },
                         cursor: 'pointer',
                         '&:hover': {
                           background: isDark
