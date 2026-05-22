@@ -31,6 +31,7 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave'; // Logo
 import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LanguageIcon from '@mui/icons-material/Language';
 
 const drawerWidth = 260;
 
@@ -290,7 +291,16 @@ export default function Layout({ children, currentPage, setCurrentPage, mode, to
                 <Typography variant="caption" color="text.secondary">{user?.role || 'staff'}</Typography>
               </Box>
 
-              <MenuItem onClick={handleSettings} sx={{ py: 1.2, px: 2, gap: 1.5, mt: 0.5 }}>
+              <MenuItem onClick={() => { handleMenuClose(); setCurrentPage('landing'); }} sx={{ py: 1.2, px: 2, gap: 1.5, mt: 0.5 }}>
+                <ListItemIcon sx={{ minWidth: 'unset', color: 'text.secondary' }}>
+                  <LanguageIcon fontSize="small" />
+                </ListItemIcon>
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                  {language === 'eng' ? 'View Website' : 'Lihat Website'}
+                </Typography>
+              </MenuItem>
+
+              <MenuItem onClick={handleSettings} sx={{ py: 1.2, px: 2, gap: 1.5 }}>
                 <ListItemIcon sx={{ minWidth: 'unset', color: 'text.secondary' }}>
                   <SettingsIcon fontSize="small" />
                 </ListItemIcon>

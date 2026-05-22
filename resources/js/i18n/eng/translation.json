@@ -4,7 +4,8 @@
     "rental_desk": "Rental Desk",
     "rentals": "Rentals Logs",
     "fleet": "Fleet Manager",
-    "customers": "Customer Base"
+    "customers": "Customer Base",
+    "profile": "Profile"
   },
   "dashboard": {
     "title": "Dashboard",

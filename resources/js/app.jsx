@@ -19,6 +19,7 @@ const RentalDesk = lazy(() => import('./pages/RentalDesk'));
 const Fleet = lazy(() => import('./pages/Fleet'));
 const Customers = lazy(() => import('./pages/Customers'));
 const Rentals = lazy(() => import('./pages/Rentals'));
+const Landing = lazy(() => import('./pages/Landing'));
 
 function PageFallback() {
   return (
@@ -314,11 +315,13 @@ function App() {
   }), [mode]);
 
   // ─── Auth Gate ────────────────────────────────────────────────────────────
-  const [authPage, setAuthPage] = useState('login'); // 'login' | 'register'
+  const [authPage, setAuthPage] = useState('landing'); // 'landing' | 'login' | 'register'
 
   // Render Page Component dynamically (keeps sidebar state and enables persistent-like cashier flow)
   const renderPage = () => {
     switch (currentPage) {
+      case 'landing':
+        return <Landing setCurrentPage={setCurrentPage} mode={mode} toggleColorMode={toggleColorMode} />;
       case 'dashboard':
         return <Dashboard setCurrentPage={setCurrentPage} />;
       case 'rental-desk':
@@ -377,10 +380,24 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
   }
 
   if (!user) {
+    if (authPage === 'landing') {
+      return (
+        <Suspense fallback={<PageFallback />}>
+          <Landing
+            onGoLogin={() => setAuthPage('login')}
+            onGoRegister={() => setAuthPage('register')}
+            setCurrentPage={setCurrentPage}
+            mode={mode}
+            toggleColorMode={toggleColorMode}
+          />
+        </Suspense>
+      );
+    }
+
     return (
       <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-        {/* Shared video — stays mounted across login ↔ register */}
-        {isMobile && (
+        {/* Shared video — only on desktop/widescreen for better mobile performance! */}
+        {!isMobile && (
           <>
             <Box
               component="video"
@@ -400,7 +417,7 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
                 minWidth: '100%',
                 minHeight: '100%',
                 maxWidth: 'none',
-                objectFit: 'contain',
+                objectFit: 'cover',
                 zIndex: 0,
                 pointerEvents: 'none',
                 backgroundColor: '#000',
@@ -410,7 +427,7 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
               sx={{
                 position: 'fixed',
                 inset: 0,
-                background: 'rgba(0,0,0,0.48)',
+                background: mode === 'dark' ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.75)',
                 zIndex: 1,
                 pointerEvents: 'none',
               }}
@@ -435,12 +452,28 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
           </>
         )}
 
-        {/* Auth pages — no video, no mute button inside them */}
-        {authPage === 'register'
-          ? <RegisterPage onGoLogin={() => setAuthPage('login')} />
-          : <LoginPage onGoRegister={() => setAuthPage('register')} />
-        }
+        {/* Auth pages */}
+        {authPage === 'register' ? (
+          <RegisterPage onGoLogin={() => setAuthPage('login')} onBackHome={() => setAuthPage('landing')} />
+        ) : (
+          <LoginPage onGoRegister={() => setAuthPage('register')} onBackHome={() => setAuthPage('landing')} />
+        )}
       </Box>
+    );
+  }
+
+  // If user is logged in but has current page set to landing, render landing directly (outside Layout)
+  if (currentPage === 'landing') {
+    return (
+      <Suspense fallback={<PageFallback />}>
+        <Landing
+          onGoLogin={() => setAuthPage('login')}
+          onGoRegister={() => setAuthPage('register')}
+          setCurrentPage={setCurrentPage}
+          mode={mode}
+          toggleColorMode={toggleColorMode}
+        />
+      </Suspense>
     );
   }
 

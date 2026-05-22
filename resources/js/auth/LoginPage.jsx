@@ -13,9 +13,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import TimeToLeaveIcon from '@mui/icons-material/TimeToLeave';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useAuth } from './AuthContext';
 
-export default function LoginPage({ onGoRegister }) {
+export default function LoginPage({ onGoRegister, onBackHome }) {
     const { login } = useAuth();
     const [email, setEmail]       = useState('');
     const [password, setPassword] = useState('');
@@ -51,12 +52,10 @@ export default function LoginPage({ onGoRegister }) {
                 justifyContent: 'center',
                 position: 'relative',
                 zIndex: 2,
-                background: isMobile
-                    ? 'transparent'
-                    : (t) =>
-                        t.palette.mode === 'dark'
-                            ? 'radial-gradient(ellipse at 60% 20%, #1a1a2e 0%, #0d0d0d 70%)'
-                            : 'radial-gradient(ellipse at 60% 20%, #f0f4ff 0%, #f2f2f0 70%)',
+                background: (t) =>
+                    t.palette.mode === 'dark'
+                        ? 'radial-gradient(ellipse at 60% 20%, #121212 0%, #0d0d0d 70%)'
+                        : 'radial-gradient(ellipse at 60% 20%, #f4f6fa 0%, #f2f2f0 70%)',
                 p: 2,
             }}
         >
@@ -68,16 +67,26 @@ export default function LoginPage({ onGoRegister }) {
                     maxWidth: 420,
                     p: { xs: 3, sm: 4 },
                     borderRadius: 4,
-                    backdropFilter: isMobile ? 'none' : 'blur(20px)',
-                    WebkitBackdropFilter: isMobile ? 'none' : 'blur(20px)',
-                    ...(isMobile && {
-                        background: 'transparent !important',
-                        backgroundColor: 'transparent !important',
-                        border: 'none',
-                        boxShadow: 'none',
-                    }),
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
                 }}
             >
+                {/* Back to Home Button */}
+                <Box sx={{ mb: 2 }}>
+                    <Button
+                        startIcon={<ArrowBackIcon />}
+                        onClick={onBackHome}
+                        size="small"
+                        sx={{
+                            color: 'text.secondary',
+                            fontWeight: 700,
+                            '&:hover': { color: 'text.primary' }
+                        }}
+                    >
+                        Kembali ke Beranda
+                    </Button>
+                </Box>
+
                 {/* Brand */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
                     <Box sx={{
@@ -91,13 +100,13 @@ export default function LoginPage({ onGoRegister }) {
                         <Typography variant="h6" sx={{
                             fontWeight: 800, lineHeight: 1.1,
                             fontFamily: '"Google Sans", sans-serif',
-                            color: isMobile ? '#fff' : 'text.primary',
+                            color: 'text.primary',
                         }}>
                             Smart Rental
                         </Typography>
                         <Typography variant="caption" sx={{
                             letterSpacing: 0.5,
-                            color: isMobile ? 'rgba(255,255,255,0.55)' : 'text.secondary',
+                            color: 'text.secondary',
                         }}>
                             MANAGEMENT SYSTEM
                         </Typography>
@@ -106,13 +115,13 @@ export default function LoginPage({ onGoRegister }) {
 
                 <Typography variant="h5" sx={{
                     fontWeight: 700, mb: 0.5,
-                    color: isMobile ? '#fff' : 'text.primary',
+                    color: 'text.primary',
                 }}>
                     Selamat datang
                 </Typography>
                 <Typography variant="body2" sx={{
                     mb: 3,
-                    color: isMobile ? 'rgba(255,255,255,0.6)' : 'text.secondary',
+                    color: 'text.secondary',
                 }}>
                     Masuk untuk melanjutkan ke dashboard
                 </Typography>
@@ -126,20 +135,17 @@ export default function LoginPage({ onGoRegister }) {
                         label="Email" type="email"
                         value={email} onChange={(e) => setEmail(e.target.value)}
                         required fullWidth autoComplete="email" autoFocus
-                        sx={isMobile ? mobileFieldSx : {}}
                     />
                     <TextField
                         label="Password"
                         type={showPass ? 'text' : 'password'}
                         value={password} onChange={(e) => setPassword(e.target.value)}
                         required fullWidth autoComplete="current-password"
-                        sx={isMobile ? mobileFieldSx : {}}
                         InputProps={{
                             endAdornment: (
                                 <InputAdornment position="end">
                                     <IconButton
                                         onClick={() => setShowPass(v => !v)} edge="end" size="small"
-                                        sx={isMobile ? { color: 'rgba(255,255,255,0.65)' } : {}}
                                     >
                                         {showPass ? <VisibilityOffIcon /> : <VisibilityIcon />}
                                     </IconButton>
@@ -156,16 +162,16 @@ export default function LoginPage({ onGoRegister }) {
                     </Button>
                 </Box>
 
-                <Divider sx={{ my: 3, borderColor: isMobile ? 'rgba(255,255,255,0.12)' : undefined }} />
+                <Divider sx={{ my: 3 }} />
 
                 <Box sx={{ textAlign: 'center' }}>
                     <Typography variant="body2" sx={{
-                        color: isMobile ? 'rgba(255,255,255,0.6)' : 'text.secondary',
+                        color: 'text.secondary',
                     }}>
                         Belum punya akun?{' '}
                         <Typography
                             component="span" variant="body2"
-                            sx={{ fontWeight: 700, cursor: 'pointer', color: isMobile ? '#e5e5e5' : 'primary.main' }}
+                            sx={{ fontWeight: 700, cursor: 'pointer', color: 'primary.main' }}
                             onClick={onGoRegister}
                         >
                             Daftar sekarang
@@ -176,15 +182,3 @@ export default function LoginPage({ onGoRegister }) {
         </Box>
     );
 }
-
-const mobileFieldSx = {
-    '& .MuiOutlinedInput-root': {
-        background: 'rgba(255,255,255,0.07)',
-        '& fieldset': { borderColor: 'rgba(255,255,255,0.18)' },
-        '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.38)' },
-        '&.Mui-focused fieldset': { borderColor: 'rgba(255,255,255,0.65)', borderWidth: 1.5 },
-        '& input': { color: '#fff' },
-    },
-    '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.55)' },
-    '& .MuiInputLabel-root.Mui-focused': { color: 'rgba(255,255,255,0.9)' },
-};
