@@ -64,12 +64,17 @@ export default function Fleet() {
         fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } }),
         fetch('/api/categories', { headers: { 'Accept': 'application/json' } }),
       ]);
+      
+      if (!vehiclesRes.ok || !categoriesRes.ok) {
+        throw new Error('Failed to fetch fleet data');
+      }
+
       const [vehiclesData, categoriesData] = await Promise.all([
         vehiclesRes.json(),
         categoriesRes.json(),
       ]);
-      setVehicles(vehiclesData);
-      setCategories(categoriesData);
+      setVehicles(Array.isArray(vehiclesData) ? vehiclesData : []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
     } catch (err) {
       console.error(err);
       showToast(t('fleet.toast_load_failed'), 'error');
@@ -81,23 +86,39 @@ export default function Fleet() {
   const fetchVehicles = () => {
     setLoading(true);
     fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setVehicles(data);
+        setVehicles(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         showToast(t('fleet.toast_load_failed'), 'error');
+        setVehicles([]);
         setLoading(false);
       });
   };
 
   const fetchCategories = () => {
     fetch('/api/categories', { headers: { 'Accept': 'application/json' } })
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error(err));
+      .then(async res => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
+      .then(data => setCategories(Array.isArray(data) ? data : []))
+      .catch(err => {
+        console.error(err);
+        setCategories([]);
+      });
   };
 
   const showToast = (message, severity = 'success') => {

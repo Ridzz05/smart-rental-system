@@ -49,7 +49,13 @@ export default function Dashboard({ setCurrentPage }) {
         'Accept': 'application/json'
       }
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
         setStats(data);
         setLoading(false);

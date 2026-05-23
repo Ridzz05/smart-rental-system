@@ -62,14 +62,20 @@ export default function RentalDesk() {
         fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } }),
         fetch('/api/customers', { headers: { 'Accept': 'application/json' } })
       ]);
+      
+      if (!vRes.ok || !cRes.ok) {
+        throw new Error('Failed to fetch checkout data');
+      }
+
       const vData = await vRes.json();
       const cData = await cRes.json();
       
-      setVehicles(vData);
-      setCustomers(cData);
+      const safeVehicles = Array.isArray(vData) ? vData : [];
+      setVehicles(safeVehicles);
+      setCustomers(Array.isArray(cData) ? cData : []);
       
       // Extract unique categories from vehicle data
-      const cats = ['All', ...new Set(vData.map(v => v.category?.name).filter(Boolean))];
+      const cats = ['All', ...new Set(safeVehicles.map(v => v.category?.name).filter(Boolean))];
       setCategories(cats);
     } catch (err) {
       console.error('Error fetching checkout data:', err);

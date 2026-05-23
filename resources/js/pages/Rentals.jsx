@@ -46,14 +46,21 @@ export default function Rentals() {
     const fetchRentals = () => {
         setLoading(true);
         fetch("/api/rentals", { headers: { "Accept": "application/json" } })
-            .then((res) => res.json())
+            .then(async (res) => {
+                if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    throw new Error(errData.message || `HTTP ${res.status}`);
+                }
+                return res.json();
+            })
             .then((data) => {
-                setRentals(data);
+                setRentals(Array.isArray(data) ? data : []);
                 setLoading(false);
             })
             .catch((err) => {
                 console.error("Error fetching rentals:", err);
                 showToast(t("rentals.toast_load_failed"), "error");
+                setRentals([]);
                 setLoading(false);
             });
     };

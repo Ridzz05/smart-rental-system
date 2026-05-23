@@ -55,13 +55,20 @@ export default function Landing({ onGoLogin, onGoRegister, setCurrentPage, mode,
         'Accept': 'application/json'
       }
     })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setVehicles(data);
+        setVehicles(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error('Error loading vehicles:', err);
+        setVehicles([]);
         setLoading(false);
       });
   }, []);

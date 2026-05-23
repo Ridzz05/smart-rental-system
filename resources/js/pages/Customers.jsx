@@ -60,14 +60,21 @@ export default function Customers() {
   const fetchCustomers = () => {
     setLoading(true);
     fetch('/api/customers', { headers: { 'Accept': 'application/json' } })
-      .then(res => res.json())
+      .then(async res => {
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.message || `HTTP ${res.status}`);
+        }
+        return res.json();
+      })
       .then(data => {
-        setCustomers(data);
+        setCustomers(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
         console.error(err);
         showToast(t('customers.toast_load_failed'), 'error');
+        setCustomers([]);
         setLoading(false);
       });
   };
