@@ -59,8 +59,8 @@ export default function RentalDesk() {
     setLoading(true);
     try {
       const [vRes, cRes] = await Promise.all([
-        fetch('/api/vehicles'),
-        fetch('/api/customers')
+        fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } }),
+        fetch('/api/customers', { headers: { 'Accept': 'application/json' } })
       ]);
       const vData = await vRes.json();
       const cData = await cRes.json();

@@ -50,7 +50,11 @@ export default function Landing({ onGoLogin, onGoRegister, setCurrentPage, mode,
 
   // Fetch Fleet Data
   useEffect(() => {
-    fetch('/api/vehicles')
+    fetch('/api/vehicles', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setVehicles(data);

@@ -45,7 +45,7 @@ export default function Rentals() {
 
     const fetchRentals = () => {
         setLoading(true);
-        fetch("/api/rentals")
+        fetch("/api/rentals", { headers: { "Accept": "application/json" } })
             .then((res) => res.json())
             .then((data) => {
                 setRentals(data);

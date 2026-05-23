@@ -44,7 +44,11 @@ export default function Dashboard({ setCurrentPage }) {
 
   const fetchStats = () => {
     setLoading(true);
-    fetch('/api/dashboard/stats')
+    fetch('/api/dashboard/stats', {
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
       .then(res => res.json())
       .then(data => {
         setStats(data);

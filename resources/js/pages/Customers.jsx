@@ -59,7 +59,7 @@ export default function Customers() {
 
   const fetchCustomers = () => {
     setLoading(true);
-    fetch('/api/customers')
+    fetch('/api/customers', { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(data => {
         setCustomers(data);

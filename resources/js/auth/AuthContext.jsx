@@ -16,7 +16,10 @@ export function AuthProvider({ children }) {
 
     // Boot: check session
     useEffect(() => {
-        fetch('/api/me', { credentials: 'same-origin' })
+        fetch('/api/me', {
+            credentials: 'same-origin',
+            headers: { 'Accept': 'application/json' }
+        })
             .then(async r => (r.ok ? safeJson(r) : null))
             .then(data => { setUser(data); setAuthLoading(false); })
             .catch(() => { setUser(null); setAuthLoading(false); });
@@ -26,7 +29,11 @@ export function AuthProvider({ children }) {
         const res = await fetch('/api/login', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF()
+            },
             body: JSON.stringify({ email, password }),
         });
         const data = await safeJson(res);
@@ -39,7 +46,11 @@ export function AuthProvider({ children }) {
         const res = await fetch('/api/register', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF()
+            },
             body: JSON.stringify({ name, email, password, password_confirmation }),
         });
         const data = await safeJson(res);
@@ -52,7 +63,11 @@ export function AuthProvider({ children }) {
         await fetch('/api/logout', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF()
+            },
         });
         setUser(null);
     }, []);
@@ -61,7 +76,11 @@ export function AuthProvider({ children }) {
         const res = await fetch('/api/me', {
             method: 'PUT',
             credentials: 'same-origin',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF() },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': CSRF()
+            },
             body: JSON.stringify(payload),
         });
         const data = await safeJson(res);

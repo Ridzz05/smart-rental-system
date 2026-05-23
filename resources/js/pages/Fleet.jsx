@@ -61,8 +61,8 @@ export default function Fleet() {
     setLoading(true);
     try {
       const [vehiclesRes, categoriesRes] = await Promise.all([
-        fetch('/api/vehicles'),
-        fetch('/api/categories'),
+        fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } }),
+        fetch('/api/categories', { headers: { 'Accept': 'application/json' } }),
       ]);
       const [vehiclesData, categoriesData] = await Promise.all([
         vehiclesRes.json(),
@@ -80,7 +80,7 @@ export default function Fleet() {
 
   const fetchVehicles = () => {
     setLoading(true);
-    fetch('/api/vehicles')
+    fetch('/api/vehicles', { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(data => {
         setVehicles(data);
@@ -94,7 +94,7 @@ export default function Fleet() {
   };
 
   const fetchCategories = () => {
-    fetch('/api/categories')
+    fetch('/api/categories', { headers: { 'Accept': 'application/json' } })
       .then(res => res.json())
       .then(data => setCategories(data))
       .catch(err => console.error(err));
