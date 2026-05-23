@@ -51,10 +51,12 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                 justifyContent: 'center',
                 position: 'relative',
                 zIndex: 2,
-                background: (t) =>
-                    t.palette.mode === 'dark'
-                        ? 'radial-gradient(ellipse at 40% 80%, #121212 0%, #0d0d0d 70%)'
-                        : 'radial-gradient(ellipse at 40% 80%, #f4f6fa 0%, #f2f2f0 70%)',
+                background: isMobile
+                    ? 'transparent'
+                    : (t) =>
+                        t.palette.mode === 'dark'
+                            ? 'radial-gradient(ellipse at 40% 80%, #121212 0%, #0d0d0d 70%)'
+                            : 'radial-gradient(ellipse at 40% 80%, #f4f6fa 0%, #f2f2f0 70%)',
                 p: 2,
             }}
         >
@@ -66,8 +68,10 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                     maxWidth: 440,
                     p: { xs: 3, sm: 4 },
                     borderRadius: 4,
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
+                    background: isMobile ? 'transparent' : undefined,
+                    boxShadow: isMobile ? 'none' : undefined,
+                    backdropFilter: isMobile ? 'none' : 'blur(20px)',
+                    WebkitBackdropFilter: isMobile ? 'none' : 'blur(20px)',
                 }}
             >
                 {/* Back to Home Button */}
@@ -85,6 +89,54 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                         Kembali ke Beranda
                     </Button>
                 </Box>
+
+                {/* Mobile Login / Register Switcher */}
+                {isMobile && (
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            borderRadius: '24px',
+                            bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                            p: 0.5,
+                            mb: 4,
+                            border: (t) => t.palette.mode === 'dark' ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.08)'
+                        }}
+                    >
+                        <Button
+                            fullWidth
+                            variant="text"
+                            onClick={onGoLogin}
+                            sx={{
+                                borderRadius: '20px',
+                                py: 1,
+                                color: 'text.secondary',
+                                fontWeight: 500,
+                                '&:hover': {
+                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                                    color: 'text.primary'
+                                }
+                            }}
+                        >
+                            Masuk
+                        </Button>
+                        <Button
+                            fullWidth
+                            variant="text"
+                            sx={{
+                                borderRadius: '20px',
+                                py: 1,
+                                bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)',
+                                color: 'text.primary',
+                                fontWeight: 700,
+                                '&:hover': {
+                                    bgcolor: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.15)',
+                                }
+                            }}
+                        >
+                            Daftar
+                        </Button>
+                    </Box>
+                )}
 
                 {/* Brand */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 4 }}>
@@ -134,11 +186,13 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                         label="Nama Lengkap" value={form.name} onChange={set('name')}
                         required fullWidth autoFocus
                         error={!!fieldError('name')} helperText={fieldError('name')}
+                        sx={isMobile ? { '& .MuiOutlinedInput-root': { background: 'transparent' } } : undefined}
                     />
                     <TextField
                         label="Email" type="email" value={form.email} onChange={set('email')}
                         required fullWidth autoComplete="email"
                         error={!!fieldError('email')} helperText={fieldError('email')}
+                        sx={isMobile ? { '& .MuiOutlinedInput-root': { background: 'transparent' } } : undefined}
                     />
                     <TextField
                         label="Password" type={showPass ? 'text' : 'password'}
@@ -157,6 +211,7 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                                 </InputAdornment>
                             ),
                         }}
+                        sx={isMobile ? { '& .MuiOutlinedInput-root': { background: 'transparent' } } : undefined}
                     />
                     <TextField
                         label="Konfirmasi Password" type={showPass ? 'text' : 'password'}
@@ -167,11 +222,26 @@ export default function RegisterPage({ onGoLogin, onBackHome }) {
                             form.password !== form.password_confirmation && form.password_confirmation.length > 0
                                 ? 'Password tidak cocok' : ''
                         }
+                        sx={isMobile ? { '& .MuiOutlinedInput-root': { background: 'transparent' } } : undefined}
                     />
                     <Button
                         type="submit" variant="contained" fullWidth size="large"
                         disabled={loading}
-                        sx={{ borderRadius: 2, fontWeight: 700, mt: 1, py: 1.4 }}
+                        sx={{
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            mt: 1,
+                            py: 1.4,
+                            ...(isMobile && {
+                                background: 'transparent',
+                                border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.4)'}`,
+                                color: 'text.primary',
+                                '&:hover': {
+                                    background: (t) => t.palette.mode === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
+                                    border: (t) => `1px solid ${t.palette.mode === 'dark' ? 'rgba(255,255,255,0.6)' : 'rgba(0,0,0,0.6)'}`,
+                                }
+                            })
+                        }}
                     >
                         {loading ? <CircularProgress size={22} color="inherit" /> : 'Daftar'}
                     </Button>

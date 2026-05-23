@@ -396,61 +396,59 @@ function AuthGate({ authPage, setAuthPage, renderPage, currentPage, setCurrentPa
 
     return (
       <Box sx={{ position: 'relative', minHeight: '100vh' }}>
-        {/* Shared video — only on desktop/widescreen for better mobile performance! */}
-        {!isMobile && (
-          <>
-            <Box
-              component="video"
-              ref={videoRef}
-              src="/assets/mp4/bmw-m3.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
+        {/* Shared video — rendered on desktop and on mobile for login/register pages */}
+        <>
+          <Box
+            component="video"
+            ref={videoRef}
+            src="/assets/mp4/bmw-m3.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: 'auto',
+              height: 'auto',
+              minWidth: '100%',
+              minHeight: '100%',
+              maxWidth: 'none',
+              objectFit: 'cover',
+              zIndex: 0,
+              pointerEvents: 'none',
+              backgroundColor: '#000',
+            }}
+          />
+          <Box
+            sx={{
+              position: 'fixed',
+              inset: 0,
+              background: mode === 'dark' ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.75)',
+              zIndex: 1,
+              pointerEvents: 'none',
+            }}
+          />
+          <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 10 }}>
+            <IconButton
+              onClick={toggleMute}
+              size="medium"
               sx={{
-                position: 'fixed',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: 'auto',
-                height: 'auto',
-                minWidth: '100%',
-                minHeight: '100%',
-                maxWidth: 'none',
-                objectFit: 'cover',
-                zIndex: 0,
-                pointerEvents: 'none',
-                backgroundColor: '#000',
+                background: 'rgba(0,0,0,0.45)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backdropFilter: 'blur(8px)',
+                color: '#fff',
+                width: 44, height: 44,
+                '&:hover': { background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.4)' },
+                transition: 'all 0.2s ease',
               }}
-            />
-            <Box
-              sx={{
-                position: 'fixed',
-                inset: 0,
-                background: mode === 'dark' ? 'rgba(0,0,0,0.75)' : 'rgba(255,255,255,0.75)',
-                zIndex: 1,
-                pointerEvents: 'none',
-              }}
-            />
-            <Box sx={{ position: 'fixed', top: 20, right: 20, zIndex: 10 }}>
-              <IconButton
-                onClick={toggleMute}
-                size="medium"
-                sx={{
-                  background: 'rgba(0,0,0,0.45)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  backdropFilter: 'blur(8px)',
-                  color: '#fff',
-                  width: 44, height: 44,
-                  '&:hover': { background: 'rgba(0,0,0,0.65)', border: '1px solid rgba(255,255,255,0.4)' },
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
-              </IconButton>
-            </Box>
-          </>
-        )}
+            >
+              {muted ? <VolumeOffIcon fontSize="small" /> : <VolumeUpIcon fontSize="small" />}
+            </IconButton>
+          </Box>
+        </>
 
         {/* Auth pages */}
         {authPage === 'register' ? (
